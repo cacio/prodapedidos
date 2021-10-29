@@ -1,0 +1,13 @@
+{
+  "name": "prodapedidos",
+  "displayName": "prodapedidos",
+  "expo": {
+    "name": "prodapedidos",
+    "slug": "prodapedidos",
+    "scheme":"prodapedidos",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
