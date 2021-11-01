@@ -1,6 +1,7 @@
 import React from 'react';
 import { HighlightCard,TransactionCardProps } from '../../components/HighlightCard';
 import { MenuCard,TransactionCardMenuProps } from '../../components/MenuCard';
+import { useAuth } from '../../hooks/auth';
 
 import { Container,Header,UserInfo,Photo,User,UserGreeting,UserName,UserWrapper,Icon,HighlightCards,MenuDashboard,Title,MenuDashboardList,LogoutButton} from './styles';
 
@@ -13,7 +14,9 @@ export interface DataListMenuCard extends TransactionCardMenuProps{
 }
 
 export function Dashboard(){
-   
+    
+    const {signOut,user} = useAuth();
+
     const datacli: DataCliListProps[] = 
             [
                 {
@@ -114,13 +117,13 @@ export function Dashboard(){
             <Header>
                 <UserWrapper>
                     <UserInfo>
-                        <Photo source={{uri:'https://avatars.githubusercontent.com/u/4051536?v=4'}}/>
+                        <Photo source={{uri:user.photo}}/>
                         <User>
                             <UserGreeting>Olá,</UserGreeting>
-                            <UserName>Cacio</UserName>
+                            <UserName>{user.name}</UserName>
                         </User> 
                     </UserInfo>
-                    <LogoutButton onPress={()=>{}}>
+                    <LogoutButton onPress={signOut}>
                         <Icon name="power"/>
                     </LogoutButton>
                 </UserWrapper>                

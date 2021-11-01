@@ -1,14 +1,34 @@
-import React from 'react';
+import React,{useState} from 'react';
 import { RFValue } from 'react-native-responsive-fontsize';
+import {ActivityIndicator,Alert} from 'react-native';
+import {useTheme} from 'styled-components';
 
 import AplleSvg from '../../assets/apple.svg';
 import GoogleSvg from '../../assets/google.svg';
 import LogoSvg from '../../assets/logo.svg';
 
+import {useAuth} from '../../hooks/auth';
+
 import {SignInSocialButton} from '../../components/SignInSocialButton';
 import {Container,Header,TitileWrapper,Title,SignInTitle,Footer,FooterWrapper} from './styles';
 
 export function SignIn(){
+    const [isloading,setIsloading] = useState(false);
+    const {signInWithGoogle} = useAuth();
+    const theme = useTheme();
+
+    async function handlersignInWithGoogle(){
+        try {            
+           setIsloading(true);
+           return await signInWithGoogle();            
+        } catch (error) {
+            setIsloading(false);
+            console.log(error);
+            Alert.alert('Não foi possivel conectar a conta google!');       
+        }
+
+    }
+
     return (
         <Container>
             <Header>
@@ -26,15 +46,16 @@ export function SignIn(){
 
                 <SignInTitle>
                     Faça seu login com{'\n'}
-                    uma das contas abaixo
+                    uma das contas abaixoversion 
                 </SignInTitle>
             </Header>
 
             <Footer>
                 <FooterWrapper>
-                <SignInSocialButton title="Entrar com Google" svg={GoogleSvg} onPress={()=>{}}/>   
+                <SignInSocialButton title="Entrar com Google" svg={GoogleSvg} onPress={handlersignInWithGoogle}/>   
                 <SignInSocialButton title="Entrar com Apple" svg={AplleSvg} onPress={()=>{}}/>
-                </FooterWrapper>               
+                </FooterWrapper>   
+                {isloading && <ActivityIndicator color={theme.colors.shape} style={{marginTop:18}} />}            
             </Footer>
         </Container>
     )
