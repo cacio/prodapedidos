@@ -14,7 +14,7 @@ import {Container,Header,TitileWrapper,Title,SignInTitle,Footer,FooterWrapper} f
 
 export function SignIn(){
     const [isloading,setIsloading] = useState(false);
-    const {signInWithGoogle} = useAuth();
+    const {signInWithGoogle,signInWithApple} = useAuth();
     const theme = useTheme();
 
     async function handlersignInWithGoogle(){
@@ -27,6 +27,19 @@ export function SignIn(){
             Alert.alert('Não foi possivel conectar a conta google!');       
         }
 
+    }
+
+    async function handlersignInWithApple(){
+        try {
+            setIsloading(true);
+          return  await signInWithApple();
+            
+        } catch (error) {
+            console.log(error);
+            Alert.alert('Não foi possivel conectar a conta Apple!');
+            setIsloading(false);
+        }
+        
     }
 
     return (
@@ -52,8 +65,8 @@ export function SignIn(){
 
             <Footer>
                 <FooterWrapper>
-                <SignInSocialButton title="Entrar com Google" svg={GoogleSvg} onPress={handlersignInWithGoogle}/>   
-                <SignInSocialButton title="Entrar com Apple" svg={AplleSvg} onPress={()=>{}}/>
+                    <SignInSocialButton title="Entrar com Google" svg={GoogleSvg} onPress={handlersignInWithGoogle}/>   
+                    <SignInSocialButton title="Entrar com Apple" svg={AplleSvg} onPress={handlersignInWithApple}/>
                 </FooterWrapper>   
                 {isloading && <ActivityIndicator color={theme.colors.shape} style={{marginTop:18}} />}            
             </Footer>
