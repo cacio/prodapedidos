@@ -15,13 +15,14 @@ export interface TransactionCardMenuProps {
 }
 
 interface Props{
-    data:TransactionCardMenuProps
+    data:TransactionCardMenuProps,
+    onPress:()=>void;
 }
 
-export function MenuCard({ data }:Props){
+export function MenuCard({ data,onPress }:Props){
     return(
 
-        <Container>
+        <Container onPress={onPress}>
             <MenuWrapper>
                 <Icon name={data.category.icon} />
                 <InfoMenu>

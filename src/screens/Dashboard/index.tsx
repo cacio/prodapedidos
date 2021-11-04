@@ -2,6 +2,7 @@ import React from 'react';
 import { HighlightCard,TransactionCardProps } from '../../components/HighlightCard';
 import { MenuCard,TransactionCardMenuProps } from '../../components/MenuCard';
 import { useAuth } from '../../hooks/auth';
+import { useNavigation } from '@react-navigation/core';
 
 import { Container,Header,UserInfo,Photo,User,UserGreeting,UserName,UserWrapper,Icon,HighlightCards,MenuDashboard,Title,MenuDashboardList,LogoutButton} from './styles';
 
@@ -16,6 +17,12 @@ export interface DataListMenuCard extends TransactionCardMenuProps{
 export function Dashboard(){
     
     const {signOut,user} = useAuth();
+    
+    type NavigationProps = {
+        navigate:(screen:string) => void;
+     }
+
+    const navigator = useNavigation<NavigationProps>();
 
     const datacli: DataCliListProps[] = 
             [
@@ -112,6 +119,12 @@ export function Dashboard(){
         }
     ];
 
+    function handlerSelctedMenu(menu:String){
+        if(menu == '1'){
+            navigator.navigate('Clientes');
+        }
+    }
+
     return (
         <Container>
             <Header>
@@ -140,7 +153,7 @@ export function Dashboard(){
                 <MenuDashboardList 
                     data={data}
                     keyExtractor={item => item.id}
-                    renderItem={({item})=>  <MenuCard data={item} />}                    
+                    renderItem={({item})=>  <MenuCard data={item} onPress={()=>handlerSelctedMenu(item.id)} />}                    
                 />
                
             </MenuDashboard>

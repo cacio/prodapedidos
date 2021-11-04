@@ -1,14 +1,19 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+
+
 import { useTheme } from 'styled-components';
 import { Platform } from 'react-native';
 import {MaterialIcons} from '@expo/vector-icons';
 
 const { Navigator,Screen } = createBottomTabNavigator();
 
+
+
 import { Dashboard } from '../screens/Dashboard';
 import { Config } from '../screens/Config';
 import { Sincronizar } from '../screens/Sincronizar';
+
 
 export function AppRoutes(){
     const theme = useTheme();
@@ -53,9 +58,10 @@ export function AppRoutes(){
                     )
                 }}
             />
-
+           
+           
         </Navigator>
-
+       
     );
 
 }

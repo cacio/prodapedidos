@@ -1,5 +1,6 @@
 import React from 'react';
 import {Button} from '../../components/Form/Button';
+//import {Button} from 'react-native';
 import { FlatList } from "react-native-gesture-handler";
 import { opcoes } from '../../Utils/opcoes';
 import { impliente } from '../../Utils/importacliente';
@@ -35,12 +36,11 @@ export function BoxSelected({boxyesnot,setBoxYesNot,closeSelectdBox,title,typeop
 
             <FlatList
                 data={typeopt === '1' ? opcoes:impliente}
-                keyExtractor={(item)=>item.id}
+                keyExtractor={(item)=>item.key}
                 renderItem={({item})=>(
                     <Options
                         onPress={()=>handleOptionSelect(item)}
-                        isActive={boxyesnot.key === item.key} 
-                        key={item.key}                       
+                        isActive={boxyesnot.key === item.key}                                          
                     >
                         <Icon name={item.icon}/>
                         <Name>{item.name}</Name>

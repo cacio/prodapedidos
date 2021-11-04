@@ -1,8 +1,8 @@
-import { RectButton } from "react-native-gesture-handler";
+import {TouchableOpacity} from 'react-native';
 import { RFValue } from "react-native-responsive-fontsize";
 import styled from "styled-components/native";
 
-export const Button = styled(RectButton)`
+export const Button = styled(TouchableOpacity)`
     height: ${RFValue(56)}px;
     background-color: ${({theme})=>theme.colors.shape};
     border-radius: 5px;

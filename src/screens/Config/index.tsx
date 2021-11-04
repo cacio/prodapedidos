@@ -374,7 +374,7 @@ export function Config(){
                     setBoxYesNot={setPecas}
                     closeSelectdBox={()=>handlerCloseBox('pecas')}
                     title="Peças"
-                    typeopt="1"
+                    typeopt="1"                    
                 />
             </Modal>
 
@@ -426,6 +426,7 @@ export function Config(){
                     closeSelectdBox={()=>handlerCloseBox('limitecliente')}
                     title="Valida Limite Cliente"
                     typeopt="1"
+                    
                 />
             </Modal>
 
