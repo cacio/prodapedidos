@@ -5,7 +5,8 @@
     "ios": "react-native run-ios",
     "web": "expo start --web",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "api": "json-server ./src/services/server.json --host 192.168.0.8 --port 3333 --delay 700"
   },
   "dependencies": {
     "@expo-google-fonts/poppins": "^0.2.0",
@@ -15,6 +16,7 @@
     "@react-navigation/bottom-tabs": "^6.0.9",
     "@react-navigation/native": "^6.0.6",
     "@react-navigation/stack": "^6.0.11",
+    "axios": "^0.24.0",
     "babel-plugin-inline-dotenv": "^1.6.0",
     "date-fns": "^2.25.0",
     "expo": "^43.0.0",
@@ -25,6 +27,7 @@
     "expo-random": "~12.0.0",
     "expo-splash-screen": "~0.13.4",
     "expo-updates": "~0.10.5",
+    "intl": "^1.2.5",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-hook-form": "^7.18.0",
@@ -38,6 +41,7 @@
     "react-native-screens": "~3.8.0",
     "react-native-svg": "^12.1.1",
     "react-native-svg-transformer": "^0.14.3",
+    "react-native-swipe-list-view": "^3.2.9",
     "react-native-unimodules": "~0.15.0",
     "react-native-web": "0.17.1",
     "styled-components": "^5.3.1",
@@ -48,7 +52,7 @@
     "@types/react": "~17.0.21",
     "@types/react-native": "~0.64.12",
     "@types/styled-components": "^5.1.15",
-    "@types/styled-components-react-native": "^5.1.1",
+    "@types/styled-components-react-native": "^5.1.2",
     "babel-preset-expo": "8.5.1",
     "jest-expo": "^43.0.0",
     "typescript": "~4.3.5"

@@ -1,7 +1,9 @@
-import React,{useRef,useState} from 'react';
-import { useNavigation } from '@react-navigation/core';
+import React,{useRef,useState,useEffect} from 'react';
+import {Text} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Modalize } from 'react-native-modalize';
-import {VirtualizedList} from 'react-native';
+import  {api}  from '../../services/api';
+import {ClienteDTO} from '../../dtos/ClienteDTO';
 import {
     Container,
     Header,
@@ -18,22 +20,33 @@ import {
     Field,
     ButtonTypeFilter,
     IconTypeFilter,
-    Separador
+    Separador,
+    ClientLista
 } from './styles';
 
 import { InputFilter } from '../../components/Form/InputFilter';
 import { OptionsFilter } from '../OptionsFilter';
+import { ClienteCard} from '../../components/ClienteCard';
+import { Load } from '../../components/Load';
 
 export function Clientes(){
+    const [loading,setLoading] = useState(true); 
+    const [clients,setclients] = useState<ClienteDTO[]>([]);
     const [optionfilter,setOptionfilter] = useState({
-        key:'selecione',
-        name:'Selecione',
+        key:'1',
+        name:'Nome Fantasia',
     });
-    const modalizeRef = useRef<Modalize>(null);
-    
+
+    const [buttonCli,setSuttonCli] = useState({
+        id:'',
+        tipo:''
+    });
+
+    const modalizeRef      = useRef<Modalize>(null);
+    const modalizedadoscli = useRef<Modalize>(null);
 
     type NavigationProps = {
-        navigate:(screen:string) => void;
+        navigate:(screen:string,{}?) => void;        
      }
 
     const navigator = useNavigation<NavigationProps>();
@@ -50,6 +63,35 @@ export function Clientes(){
         modalizeRef.current?.close();
     }
 
+    function handlerBoxdadosCliemte(clients:ClienteDTO){
+        navigator.navigate('ProuctView',clients);
+
+    }
+
+    useEffect(()=>{
+        if(buttonCli.id != ''){
+            modalizedadoscli.current?.open();
+        }
+    },[buttonCli])
+
+    useEffect(()=>{  
+        
+        async function fecthClient() {
+            try {
+                const response = await api.get("/cliente?_limit=7");
+                const data     = response.data;
+                setclients(data);  
+                setLoading(false);
+            } catch (error) {
+                console.log(error);                
+                setLoading(false);
+            }
+        }
+        fecthClient();
+        //fecthClients();
+    },[]);
+ 
+    
     return(
         <Container>
             <Header>
@@ -68,7 +110,7 @@ export function Clientes(){
                         Disponíveis
                     </CountName>
                      <CiliTitle>                        
-                        🤓 32 Clientes
+                        🤓 {clients.length} Clientes
                      </CiliTitle>
                 </CountCli>
 
@@ -77,7 +119,7 @@ export function Clientes(){
                         <Iconfilter name="filter"/>
                     </IconWrapper>   
                     <Field>
-                       <InputFilter placeholder="Filtrar por nome, razão social, cnpj " placeholderTextColor="#fff" />
+                       <InputFilter placeholder="Buscar Cliente" placeholderTextColor="#fff" />
                     </Field> 
                     <ButtonTypeFilter onPress={handlerOpenFilterModalize}>
                         <IconTypeFilter name="chevron-down"/>
@@ -94,6 +136,17 @@ export function Clientes(){
                     title="Filtrar por ?"
                 />
             </Modalize>
+            
+            {loading ? <Load/> : 
+                <ClientLista            
+                    data={clients}
+                    keyExtractor={item => item.CODIGO}
+                    renderItem={({item})=> <ClienteCard onPress={()=>handlerBoxdadosCliemte(item)}  setbuttonselected={setSuttonCli}  data={item}  /> }                    
+                />
+            }
+             <Modalize ref={modalizedadoscli}>                
+               <Text>{buttonCli.id} -  {buttonCli.tipo}</Text>
+             </Modalize>
             
              
         </Container>

@@ -12,7 +12,8 @@ export default {
         text:'#969CB3',
         text_dark:'#000000',
         background:'#F0F2F5',
-        footerAuth:'#373435',   
+        footerAuth:'#373435',
+        borderinput:'#e5e5e5'   
     },
     fonts:{
         regular: 'Poppins_400Regular',

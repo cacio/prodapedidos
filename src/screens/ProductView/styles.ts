@@ -1,15 +1,14 @@
-import styled from "styled-components/native";
+import { getBottomSpace, getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { RFValue } from 'react-native-responsive-fontsize';
-import {FlatList} from 'react-native';
+import styled from 'styled-components/native'; 
+import { TouchableOpacity,FlatList } from 'react-native';
 import {Feather} from '@expo/vector-icons';
-import {getStatusBarHeight,getBottomSpace} from 'react-native-iphone-x-helper';
-import { TouchableOpacity } from 'react-native';
-import {ClienteDTO} from '../../dtos/ClienteDTO';
+import {RectButton} from 'react-native-gesture-handler';
+import { ProdutoDTO } from '../../dtos/ProdutoDTO';
 
 export const Container = styled.View`
-    flex: 1;        
-    background-color: ${({theme})=>theme.colors.background};
-
+    width: 100%; 
+    flex:1;
 `;
 
 export const Header = styled.View`
@@ -60,24 +59,6 @@ export const NavTitle = styled.Text`
     margin-bottom: 10px;
 `;
 
-export const CountCli = styled.View`
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 24px;
-    margin-top: 15px;
-`;
-
-export const CountName = styled.Text`
-    color: ${({theme})=>theme.colors.shape};
-    font-weight: 700;
-    font-size:${RFValue(20)}px;
-`;
-
-export const CiliTitle = styled.Text`
-     color: ${({theme})=>theme.colors.shape};
-`;
 
 export const FilterForm = styled.View`
     width: 100%;
@@ -120,13 +101,61 @@ export const IconTypeFilter = styled(Feather)`
     color: ${({theme})=>theme.colors.text};  
 `;
 
-export const ClientLista = styled(
-    FlatList as new ()=> FlatList<ClienteDTO>         
-    ).attrs({
-    showsVerticalScrollIndicator:false,
+export const DetailsCli = styled.View`
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;    
+    padding: 5px 18px;
+    margin-top: 5px;
+    margin-bottom: -7px;
+`;
+
+export const DetailWrapper = styled.View`
+    margin-left: 10px; 
+
+`;
+
+export const ImageCli = styled.Image`
+    width: ${RFValue(48)}px;
+    height: ${RFValue(48)}px;
+    border-radius: 10px;
+`;
+
+export const NomeCli = styled.Text`
+    font-size: ${RFValue(19)}px;
+    color: ${({theme})=>theme.colors.shape};
+    font-family: ${({theme})=>theme.fonts.medium};
+    margin-bottom: -5px;
+    
+`;
+
+export const FantasiaCli = styled.Text`
+    font-size: ${RFValue(12)}px;
+    color: ${({theme})=>theme.colors.shape};
+    font-family: ${({theme})=>theme.fonts.regular};
+    
+`;
+
+export const ProdutoList = styled(
+    FlatList as new ()=> FlatList<ProdutoDTO>  
+).attrs({
     contentContainerStyle:{
-        paddingBottom:getBottomSpace()                        
-    }
-})`  
-    padding:5px 5px;     
+        padding:10,
+        paddingBottom:getBottomSpace()
+    },
+    showsVerticalScrollIndicator:false,
+})`
+
+`;
+
+export const MyCarButton = styled(RectButton)`
+    width: 60px;
+    height: 60px;
+    background-color: ${({theme})=>theme.colors.primary};
+    justify-content: center;
+    align-items: center;
+    border-radius:30px;
+    position: absolute;
+    bottom:13px;
+    right:22px;
 `;
