@@ -1,4 +1,4 @@
-import React,{useState,useRef,useEffect,useCallback} from 'react'; 
+import React,{useState,useRef,useEffect} from 'react'; 
 import { useRoute,useNavigation } from '@react-navigation/native';
 import { Alert } from 'react-native';
 import { Modalize } from 'react-native-modalize';
@@ -76,10 +76,12 @@ export function DetailsProduct() {
 
     const route         = useRoute();
     const {product,cli} = route.params as ParansData; 
+    
     const dataKey       = `@prodapedido:transactions_user:${user.id}:cli:${cli.CODIGO}`;
 
     const [quantidade,setQuantidade] = useState('1');
-    const [preco,setPreco]           = useState(String(product.preco_venda));
+    const [preco,setPreco]           = useState(parseFloat(String(product.preco_venda)).toLocaleString('pt-br',
+                                                { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
     const [peso,setPeso]             = useState(0);
     const [subtotal,setSubtotal]     = useState('0');
     const [tipoqtd,setTipoqtd] = useState({
@@ -122,7 +124,9 @@ export function DetailsProduct() {
               nomeprod:product.descricao,
               preco:preco,
               peso: peso,
-              subtotal:subtotal
+              subtotal:subtotal,
+              unidade:product.unidade,
+              peso_medio:product.peso_medio
 
         }
 
@@ -168,7 +172,8 @@ export function DetailsProduct() {
                     const price = Number(priceFormatted);  
                     
                     const total = (price * qtd);                    
-                    const totalFormatted = convertToReal(total);
+                    const totalFormatted = parseFloat(String(total)).toLocaleString('pt-br',
+                    { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                     setPeso(qtd);
                     setSubtotal(totalFormatted);
 
@@ -181,7 +186,8 @@ export function DetailsProduct() {
                     
                     const total = (qtd * product.peso_medio) * price;     
                     const qtdpc = (qtd * product.peso_medio);               
-                    const totalFormatted = convertToReal(total);
+                    const totalFormatted = parseFloat(String(total)).toLocaleString('pt-br',
+                    { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                     setPeso(qtdpc);
                     setSubtotal(totalFormatted);
                 }
@@ -198,7 +204,8 @@ export function DetailsProduct() {
                    const price = Number(priceFormatted);  
                    
                    const total = (price * qtd);                    
-                   const totalFormatted = convertToReal(total);
+                   const totalFormatted = parseFloat(String(total)).toLocaleString('pt-br',
+                   { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                    setPeso(qtd);
                    setSubtotal(totalFormatted);
 
@@ -212,7 +219,8 @@ export function DetailsProduct() {
                 
                 const total = (qtd * product.peso_medio) * price;     
                 const qtdpc = (qtd * product.peso_medio);               
-                const totalFormatted = convertToReal(total);
+                const totalFormatted = parseFloat(String(total)).toLocaleString('pt-br',
+                { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 setPeso(qtdpc);
                 setSubtotal(totalFormatted);
             }
@@ -221,31 +229,6 @@ export function DetailsProduct() {
         }
     }
 
-
-    function convertToReal(number:Number, options = {moneySign:true}) {
-        const { moneySign = true } = options;
-    
-        if(Number.isNaN(number) || !number) return "need a number as the first parameter";
-    
-        if(typeof number === "string") { // n1
-            number = Number(number);
-        }
-    
-        let res;
-    
-        const config = moneySign ? {style: 'currency', currency: 'BRL'} : {minimumFractionDigits: 2};
-    
-        moneySign
-        ? res = number.toLocaleString('pt-BR', config)
-        : res = number.toLocaleString('pt-BR', config)
-    
-        //const needComma = number => number <= 1000;
-        //if(needComma(number)) {
-            res = res.toString().replace(".", ",");
-        //}
-    
-        return res; // n2
-    }
 
     useEffect(()=>{
         async function getAlterProductCarrinho() {
@@ -286,7 +269,8 @@ export function DetailsProduct() {
                const price = Number(priceFormatted);  
                
                const total = (price * qtd);                    
-               const totalFormatted = convertToReal(total);
+               const totalFormatted = parseFloat(String(total)).toLocaleString('pt-br',
+               { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                setPeso(qtd);
                setSubtotal(totalFormatted);
 
@@ -299,7 +283,8 @@ export function DetailsProduct() {
                
                const total = (qtd * product.peso_medio) * price;     
                const qtdpc = (qtd * product.peso_medio);               
-               const totalFormatted = convertToReal(total);
+               const totalFormatted = parseFloat(String(total)).toLocaleString('pt-br',
+               { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                setPeso(qtdpc);
                setSubtotal(totalFormatted);
            
@@ -364,13 +349,14 @@ export function DetailsProduct() {
                 <Details>
                     <Estoque>Estoque: {product.estoque_atual} Kg</Estoque>
                     <Pc>{product.pecas_estoque} PC</Pc>
-                    <PesoMedio>KG Médio: {product.peso_medio}</PesoMedio>
+                    <PesoMedio>KG Médio: {parseFloat(String(product.peso_medio)).toLocaleString('pt-br',
+                    { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</PesoMedio>
                 </Details>
                 
             </DetailsProducts>
             <Footer>
                 <TotalItens>Peso item: {peso} kg</TotalItens>
-                <TotalPrice>{subtotal}</TotalPrice>
+                <TotalPrice>R$ {subtotal}</TotalPrice>
             </Footer>   
             
         </Content>     
