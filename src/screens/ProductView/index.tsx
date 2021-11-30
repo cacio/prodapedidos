@@ -80,7 +80,7 @@ export function ProductView() {
     useEffect(()=>{
         async function fechtProduto() {
             try {
-                const response = await api.get('/produtos');
+                const response = await api.get('/produtos?_limit=10');
                 const data     = response.data;
                 setProduct(data);   
                 setLoading(false); 

@@ -7,6 +7,8 @@ import { AppRoutes } from './app.routes';
 import { Clientes} from '../screens/Clientes';
 import { ProductView } from '../screens/ProductView';
 import { DetailsProduct} from '../screens/DetailsProduct';
+import { checkout } from '../screens/checkout';
+
 export function RoutesStack(){
     return (
         <Navigator
@@ -42,6 +44,16 @@ export function RoutesStack(){
              <Screen 
                 name="DetailsProduct" 
                 component={DetailsProduct}                 
+                options={{
+                    gestureEnabled:true,
+                    gestureDirection:'horizontal',
+                    headerMode:'screen'
+                }}
+            />
+
+            <Screen 
+                name="checkout" 
+                component={checkout}                 
                 options={{
                     gestureEnabled:true,
                     gestureDirection:'horizontal',

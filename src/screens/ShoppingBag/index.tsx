@@ -131,6 +131,13 @@ export function ShoppingBag({cli}:Props) {
         }
     }
 
+    function RedirectCheckout(){
+        const data = {
+            cli:cli         
+        }
+        navigator.navigate('checkout',data);
+    }
+
    useEffect(()=>{
         getShoppingBag();
    },[]);
@@ -190,7 +197,7 @@ export function ShoppingBag({cli}:Props) {
 
             {carrinho.length > 0 &&
             <ButtonContent>
-                <Button onPress={()=>{}} title="FINALIZAR" />
+                <Button onPress={()=>RedirectCheckout()} title="FINALIZAR" />
             </ButtonContent>
             }
             
