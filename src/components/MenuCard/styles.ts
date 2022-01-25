@@ -5,7 +5,7 @@ import {RFValue} from 'react-native-responsive-fontsize';
 
 
 export const Container = styled(TouchableOpacity).attrs({
-    activeOpacity:.7,
+    activeOpacity:.5,
 })`
     background-color: ${({theme})=>theme.colors.shape};
     border-radius: 5px;
@@ -28,20 +28,26 @@ export const Icon = styled(Feather)`
     height:${RFValue(50)}px;
     font-size: ${RFValue(50)}px;
     margin-right: 5px;
+    color: ${({theme})=>theme.colors.text_dark};
 `;
 export const Title = styled.Text`
     font-size: ${RFValue(16)}px;
     font-family: ${({theme})=>theme.fonts.bold};
+    color: ${({theme})=>theme.colors.text_dark};
 `;
 export const SubTitle = styled.Text`
     font-size: ${RFValue(12)}px;
     font-family: ${({theme})=>theme.fonts.regular};
+    color: ${({theme})=>theme.colors.text_dark};
 `;
 export const Total = styled.Text`
     font-family: ${({theme})=>theme.fonts.bold};
+    color: ${({theme})=>theme.colors.text_dark};
 `;
+
 export const IconBotton = styled(Feather)`
     font-size: ${RFValue(30)}px;
     position: absolute;
     right: 0;
+    color: ${({theme})=>theme.colors.text_dark};
 `;

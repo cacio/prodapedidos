@@ -8,6 +8,9 @@ import { Clientes} from '../screens/Clientes';
 import { ProductView } from '../screens/ProductView';
 import { DetailsProduct} from '../screens/DetailsProduct';
 import { checkout } from '../screens/checkout';
+import { Profile } from '../screens/Profile';
+import { MeusPedidos } from '../screens/MeusPedidos';
+import { Confirmation } from '../screens/Confirmation';
 
 export function RoutesStack(){
     return (
@@ -61,6 +64,27 @@ export function RoutesStack(){
                 }}
             />
 
+            <Screen 
+                name="Profile" 
+                component={Profile}                 
+                options={{
+                    gestureEnabled:true,
+                    gestureDirection:'horizontal',
+                    headerMode:'screen'
+                }}
+            />
+
+        <Screen 
+                name="MeusPedidos" 
+                component={MeusPedidos}                 
+                options={{
+                    gestureEnabled:true,
+                    gestureDirection:'horizontal',
+                    headerMode:'screen'
+                }}
+            />
+
+            <Screen name="Confirmation" component={Confirmation} /> 
         </Navigator>
 
     );

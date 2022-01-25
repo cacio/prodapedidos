@@ -3,6 +3,8 @@ import { useFocusEffect } from '@react-navigation/core';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacityProps} from 'react-native';
 import { ClienteDTO } from '../../dtos/ClienteDTO';
+import { Clientes as modelClientes } from '../../databases/model/Clientes';
+import { Produtos as modelProdutos } from '../../databases/model/Produtos';
 import { useAuth } from '../../hooks/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Load } from '../../components/Load';
@@ -34,16 +36,19 @@ import { Button } from '../../components/Form/Button';
 import { api } from '../../services/api';
 import { ProdutoDTO } from '../../dtos/ProdutoDTO';
 import { CarrinhoEmpty } from '../../components/CarrinhoEmpty';
+import { database } from '../../databases';
+import { Q } from '@nozbe/watermelondb';
 
 
 interface Props extends TouchableOpacityProps{
-    cli:ClienteDTO;    
+    cli:modelClientes;    
 }
 
 interface CarrinhoProps{
     tipo: String;
     quantidade:String;
     codprod:String;
+    codigo:string;
     nomeprod:String;
     preco:String;
     peso: string;
@@ -70,14 +75,17 @@ export function ShoppingBag({cli}:Props) {
     async function EditaProdutoCarrinho(cod:string) {
 
         try {
-          
-            const response    = await api.get(`/produtos?id=${cod}`);
-            const dataproduct = response.data;
+
+            const colectionProdutos = database.get<modelProdutos>('produtos');
+            const dataproduto = await colectionProdutos.query(
+                Q.where('id',cod)
+            ).fetch();
 
             const data = {
                 cli:cli,
-                product: dataproduct[0]
+                product:dataproduto[0]
             }
+
             navigator.navigate('DetailsProduct',data);
             
             
@@ -157,7 +165,8 @@ export function ShoppingBag({cli}:Props) {
             {loading 
                 ?<Load/> 
                 :carrinho.map((item:CarrinhoProps) =>{
-                            return <Content key={Number(item.codprod)}>
+                            //console.log(Number(item.codprod));
+                            return <Content key={Number(item.codigo)}>
                                 <ItemCarrinho onPress={()=>EditaProdutoCarrinho(String(item.codprod))}>
                                     <ProdutoWrapper>
                                         <Nome>{item.nomeprod} ({item.unidade})</Nome>

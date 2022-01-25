@@ -1,6 +1,6 @@
 import React,{useEffect,useState,useRef} from 'react'; 
+import { LogBox } from 'react-native';
 import { useRoute,useNavigation } from '@react-navigation/native';
-import {Text} from 'react-native';
 import { Modalize } from 'react-native-modalize';
 import {Ionicons} from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -30,23 +30,31 @@ import {
 
 import { InputFilter } from '../../components/Form/InputFilter';
 import { ProdutoCard } from '../../components/ProdutoCard';
-import { ClienteDTO } from '../../dtos/ClienteDTO';
 import { useTheme } from 'styled-components';
-import { api } from '../../services/api';
-import { ProdutoDTO } from '../../dtos/ProdutoDTO';
 import { Load } from '../../components/Load';
 import { ShoppingBag } from '../ShoppingBag';
 import { useAuth } from '../../hooks/auth';
-import { CarrinhoEmpty } from '../../components/CarrinhoEmpty';
+import { Produtos as modelProdutos } from '../../databases/model/Produtos';
+import { Clientes as modelClientes } from '../../databases/model/Clientes';
+import { database } from '../../databases';
 
+interface Params{
+    cli:modelClientes
+}
+
+LogBox.ignoreLogs([
+    'Non-serializable values were found in the navigation state',
+]);
 
 export function ProductView() {
     const {user}               = useAuth();
     const [loading,setLoading] = useState(true); 
-    const [product,setProduct] = useState<ProdutoDTO[]>([]);     
+    const [product,setProduct] = useState<modelProdutos[]>([]);     
     const [carrinhoLength,setCarrinhoLength] = useState([]);
     const route  = useRoute();
-    const cli    = route.params as ClienteDTO;
+    
+    const { cli }    = route.params as Params;
+    
     const photoPadrao = `https://ui-avatars.com/api/?name=${cli.NOME}&length=1`;
     const theme = useTheme();
     const modalizeRef      = useRef<Modalize>(null);
@@ -61,7 +69,7 @@ export function ProductView() {
         modalizeRef.current?.open();
     }
     
-    function handlerDetailsProduct(product:ProdutoDTO){            
+    function handlerDetailsProduct(product:modelProdutos){            
         const data = {
             cli:cli,
             product
@@ -78,16 +86,27 @@ export function ProductView() {
     }
 
     useEffect(()=>{
+        
+        let isMouted = true;
+
         async function fechtProduto() {
             try {
-                const response = await api.get('/produtos?_limit=10');
-                const data     = response.data;
-                setProduct(data);   
+                
+                const colectionProdutos = database.get<modelProdutos>('produtos');
+                const dataproduto = await colectionProdutos.query().fetch();
+               
+                if(isMouted){
+                    setProduct(dataproduto);   
+                }
                 setLoading(false); 
                // console.log(data);
             } catch (error) {
                 console.log(error);
                 setLoading(false);
+            }finally{
+                if(isMouted){
+                    setLoading(false);
+                }
             }
         }
 
@@ -95,9 +114,7 @@ export function ProductView() {
             const dataKey     = `@prodapedido:transactions_user:${user.id}:cli:${cli.CODIGO}`;
             const data        = await AsyncStorage.getItem(dataKey);
             const currentData = data ? JSON.parse(data) : [];
-            setCarrinhoLength(currentData);    
-
-            
+            setCarrinhoLength(currentData);                
         }    
 
         fechtProduto();

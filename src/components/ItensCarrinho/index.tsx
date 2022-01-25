@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React,{useState,useEffect} from 'react'; 
 import { TouchableOpacityProps } from 'react-native';
 import { ClienteDTO } from '../../dtos/ClienteDTO';
-import { ProdutoDTO } from '../../dtos/ProdutoDTO';
+import { CarrinhoDTO as CarrinhoProps } from '../../dtos/CarrinhoDTO';
 import { useAuth } from '../../hooks/auth';
 import { Load } from '../Load';
 
@@ -25,18 +25,6 @@ import {
 
 interface Props extends TouchableOpacityProps{
     cli:ClienteDTO;    
-}
-
-interface CarrinhoProps{
-    tipo: String;
-    quantidade:String;
-    codprod:String;
-    nomeprod:String;
-    preco:String;
-    peso: string;
-    subtotal:string;
-    unidade:String;
-    peso_medio:String;
 }
 
 export function ItensCarrinho({cli}:Props) {
@@ -71,7 +59,7 @@ useEffect(()=>{
        {loading 
                 ?<Load/> 
                 :carrinho.map((item:CarrinhoProps) =>{
-                            return <Content key={Number(item.codprod)}>
+                            return <Content key={Number(item.codigo)}>
                                 <ItemCarrinho>
                                     <ProdutoWrapper>
                                         <Nome>{item.nomeprod} ({item.unidade})</Nome>

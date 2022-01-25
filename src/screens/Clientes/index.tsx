@@ -2,8 +2,7 @@ import React,{useRef,useState,useEffect} from 'react';
 import {Text} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Modalize } from 'react-native-modalize';
-import  {api}  from '../../services/api';
-import {ClienteDTO} from '../../dtos/ClienteDTO';
+import { Clientes as modelClientes } from '../../databases/model/Clientes';
 import {
     Container,
     Header,
@@ -28,10 +27,14 @@ import { InputFilter } from '../../components/Form/InputFilter';
 import { OptionsFilter } from '../OptionsFilter';
 import { ClienteCard} from '../../components/ClienteCard';
 import { Load } from '../../components/Load';
+import { useAuth } from '../../hooks/auth';
+import { database } from '../../databases';
 
 export function Clientes(){
+    const {user} = useAuth();
+
     const [loading,setLoading] = useState(true); 
-    const [clients,setclients] = useState<ClienteDTO[]>([]);
+    const [clients,setclients] = useState<modelClientes[]>([]);
     const [optionfilter,setOptionfilter] = useState({
         key:'1',
         name:'Nome Fantasia',
@@ -63,8 +66,8 @@ export function Clientes(){
         modalizeRef.current?.close();
     }
 
-    function handlerBoxdadosCliemte(clients:ClienteDTO){
-        navigator.navigate('ProuctView',clients);
+    function handlerBoxdadosCliemte(clients:modelClientes){
+        navigator.navigate('ProuctView',{cli:clients});
 
     }
 
@@ -75,16 +78,31 @@ export function Clientes(){
     },[buttonCli])
 
     useEffect(()=>{  
-        
+        let isMouted = true;
         async function fecthClient() {
+            
             try {
-                const response = await api.get("/cliente?_limit=7");
-                const data     = response.data;
-                setclients(data);  
+               
+                const clienteCollection = database.get<modelClientes>('clientes');
+                const cliente = await clienteCollection.query().fetch();
+               
+               /* await database.write(async ()=>{
+                    const cliSelected = await clienteCollection.find('qc5f4sv4sh1b9v4r')
+                    await cliSelected.destroyPermanently();                
+                });*/
+
+                
+                if(isMouted){
+                   setclients(cliente);
+                }
                 setLoading(false);
             } catch (error) {
                 console.log(error);                
                 setLoading(false);
+            }finally{
+                if(isMouted){
+                    setLoading(false);
+                }
             }
         }
         fecthClient();

@@ -4,7 +4,7 @@ import {FlatList} from 'react-native';
 import {Feather} from '@expo/vector-icons';
 import {getStatusBarHeight,getBottomSpace} from 'react-native-iphone-x-helper';
 import { TouchableOpacity } from 'react-native';
-import {ClienteDTO} from '../../dtos/ClienteDTO';
+import { Clientes as modelClientes } from '../../databases/model/Clientes';
 
 export const Container = styled.View`
     flex: 1;        
@@ -121,7 +121,7 @@ export const IconTypeFilter = styled(Feather)`
 `;
 
 export const ClientLista = styled(
-    FlatList as new ()=> FlatList<ClienteDTO>         
+    FlatList as new ()=> FlatList<modelClientes>         
     ).attrs({
     showsVerticalScrollIndicator:false,
     contentContainerStyle:{

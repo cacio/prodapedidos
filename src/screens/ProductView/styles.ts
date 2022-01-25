@@ -4,7 +4,7 @@ import styled from 'styled-components/native';
 import { TouchableOpacity,FlatList } from 'react-native';
 import {Feather} from '@expo/vector-icons';
 import {RectButton} from 'react-native-gesture-handler';
-import { ProdutoDTO } from '../../dtos/ProdutoDTO';
+import { Produtos as modelProdutos } from '../../databases/model/Produtos';
 
 export const Container = styled.View`
     width: 100%; 
@@ -137,7 +137,7 @@ export const FantasiaCli = styled.Text`
 `;
 
 export const ProdutoList = styled(
-    FlatList as new ()=> FlatList<ProdutoDTO>  
+    FlatList as new ()=> FlatList<modelProdutos>  
 ).attrs({
     contentContainerStyle:{
         padding:10,

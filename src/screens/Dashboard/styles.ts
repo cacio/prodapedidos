@@ -32,7 +32,7 @@ export const UserWrapper = styled.View`
     align-items: center;
 `;
 
-export const UserInfo     = styled.View`
+export const UserInfo     = styled(TouchableOpacity)`
     flex-direction: row;
     align-items: center;
 `;

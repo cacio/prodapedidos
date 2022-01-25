@@ -1,6 +1,6 @@
 import { RFValue } from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native'; 
-
+import { TextInput } from 'react-native';
 export const Container = styled.View`
  flex: 1; 
  background-color: ${({theme})=>theme.colors.background};
@@ -154,4 +154,26 @@ export const LabelPrice = styled.Text`
 
 export const FooterContent = styled.View`
     padding: 10px;
+`;
+
+export const ContentObs = styled.View`
+    background-color: ${({theme})=>theme.colors.shape};
+    margin: 10px 10px; 
+    padding: 10px; 
+`;
+
+export const TitleObs = styled.Text`
+    font-size: ${RFValue(14)}px;
+    font-family: ${({theme})=>theme.fonts.medium};
+    color: ${({theme})=>theme.colors.text_dark};
+`;
+export const InputObs = styled(TextInput).attrs({
+    textAlignVertical:'top'
+})`
+    justify-content:flex-start;
+    height   : 150px;
+    text-align: justify;
+    border-radius: 5px ;
+    border-width:2px;
+    border-color: ${({theme})=>theme.colors.borderinput};
 `;

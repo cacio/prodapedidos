@@ -36,10 +36,15 @@ import {
  TotalItens,
  TotalPrice,
  LabelPrice,
- FooterContent 
+ FooterContent,
+ ContentObs,
+ TitleObs,
+ InputObs 
 } from './styles';
-import { ClienteDTO } from '../../dtos/ClienteDTO';
-import { ProdutoDTO } from '../../dtos/ProdutoDTO';
+import { CarrinhoDTO as CarrinhoData } from '../../dtos/CarrinhoDTO';
+import { Produtos as modelProdutos } from '../../databases/model/Produtos';
+import { Clientes as modelClientes } from '../../databases/model/Clientes';
+
 import { RFValue } from 'react-native-responsive-fontsize';
 import {getBottomSpace} from 'react-native-iphone-x-helper';
 import { useAuth } from '../../hooks/auth';
@@ -54,20 +59,9 @@ interface DataListProps{
     key?:string,
     name?:string;
 }
-
-interface CarrinhoData{
-    tipo: string;
-    quantidade:string;
-    codprod:string;
-    nomeprod:string;
-    preco:string;
-    peso: string;
-    subtotal:string;
-}
-
 interface ParansData{
-    cli:ClienteDTO;
-    product:ProdutoDTO;
+    cli:modelClientes;
+    product:modelProdutos;
 }
 
 export function DetailsProduct() {
@@ -80,14 +74,16 @@ export function DetailsProduct() {
     const dataKey       = `@prodapedido:transactions_user:${user.id}:cli:${cli.CODIGO}`;
 
     const [quantidade,setQuantidade] = useState('1');
-    const [preco,setPreco]           = useState(parseFloat(String(product.preco_venda)).toLocaleString('pt-br',
+    const [preco,setPreco]           = useState(parseFloat(product.preco_venda).toLocaleString('pt-br',
                                                 { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
     const [peso,setPeso]             = useState(0);
     const [subtotal,setSubtotal]     = useState('0');
-    const [tipoqtd,setTipoqtd] = useState({
+    const [tipoqtd,setTipoqtd]       = useState({
         key:'1',
         name:'PESO (kg)',
     });
+
+    const [obs,setObs]                = useState('');
 
     const modalizeRef      = useRef<Modalize>(null);
 
@@ -121,13 +117,14 @@ export function DetailsProduct() {
               tipo: tipoqtd.key,
               quantidade:quantidade,
               codprod:product.id,
-              nomeprod:product.descricao,
+              codigo:product.codigo,
+              nomeprod:product.decricao,
               preco:preco,
               peso: peso,
               subtotal:subtotal,
               unidade:product.unidade,
-              peso_medio:product.peso_medio
-
+              peso_medio:product.peso_medio,
+              obs:obs   
         }
 
         try {
@@ -184,8 +181,8 @@ export function DetailsProduct() {
                     const priceFormatted = String(preco).replace(",", ".");
                     const price = Number(priceFormatted);  
                     
-                    const total = (qtd * product.peso_medio) * price;     
-                    const qtdpc = (qtd * product.peso_medio);               
+                    const total = (qtd * Number(product.peso_medio)) * price;     
+                    const qtdpc = (qtd * Number(product.peso_medio));               
                     const totalFormatted = parseFloat(String(total)).toLocaleString('pt-br',
                     { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                     setPeso(qtdpc);
@@ -217,8 +214,8 @@ export function DetailsProduct() {
                 const priceFormatted = String(text).replace(",", ".");
                 const price = Number(priceFormatted);  
                 
-                const total = (qtd * product.peso_medio) * price;     
-                const qtdpc = (qtd * product.peso_medio);               
+                const total = (qtd * Number(product.peso_medio)) * price;     
+                const qtdpc = (qtd * Number(product.peso_medio));               
                 const totalFormatted = parseFloat(String(total)).toLocaleString('pt-br',
                 { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 setPeso(qtdpc);
@@ -251,6 +248,7 @@ export function DetailsProduct() {
                 setPreco(dataProd[0].preco);
                 setPeso(dataProd[0].peso);
                 setSubtotal(dataProd[0].subtotal);
+                setObs(dataProd[0].obs)
             }
         }
         
@@ -262,6 +260,7 @@ export function DetailsProduct() {
        
     },[]);
     useEffect(()=>{
+        
         if(tipoqtd.key === '1'){
                
                const qtd   = Number(quantidade);
@@ -281,8 +280,8 @@ export function DetailsProduct() {
                const priceFormatted = String(preco).replace(",", ".");
                const price = Number(priceFormatted);  
                
-               const total = (qtd * product.peso_medio) * price;     
-               const qtdpc = (qtd * product.peso_medio);               
+               const total = (qtd * Number(product.peso_medio)) * price;     
+               const qtdpc = (qtd * Number(product.peso_medio));               
                const totalFormatted = parseFloat(String(total)).toLocaleString('pt-br',
                { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                setPeso(qtdpc);
@@ -328,7 +327,7 @@ export function DetailsProduct() {
 
             <DetailsProducts>
                 <ContentProduct>
-                    <Nome>{product.descricao}</Nome>
+                    <Nome>{product.decricao}</Nome>
                     <Unidade>({product.unidade})</Unidade>
                     <ContentInputPrice>
                         <LabelPrice>R$</LabelPrice>
@@ -358,7 +357,12 @@ export function DetailsProduct() {
                 <TotalItens>Peso item: {peso} kg</TotalItens>
                 <TotalPrice>R$ {subtotal}</TotalPrice>
             </Footer>   
-            
+             
+             <ContentObs>
+                 <TitleObs>Observação</TitleObs>
+                 <InputObs multiline={true} numberOfLines={4}  onChangeText={setObs} value={obs} />
+             </ContentObs>
+
         </Content>     
         <FooterContent>
             <Button onPress={handleSubmit(hendleAdicionaCarrinho)} title="ADICIONAR" />

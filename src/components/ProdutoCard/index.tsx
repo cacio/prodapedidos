@@ -1,6 +1,6 @@
 import React from 'react'; 
 import {TouchableOpacityProps} from 'react-native';
-import { ProdutoDTO } from '../../dtos/ProdutoDTO';
+import { Produtos as modelProdutos } from '../../databases/model/Produtos';
 
 import {
  Container,
@@ -17,7 +17,7 @@ import {
 
 
 interface Props extends TouchableOpacityProps{
-    data:ProdutoDTO
+    data:modelProdutos
 }
 
 export function ProdutoCard({data,...rest}:Props) {
@@ -25,7 +25,7 @@ export function ProdutoCard({data,...rest}:Props) {
    <Container {...rest}>
        <Product>
            <ProductWrapper>
-                <Nome>({data.id}) - {data.descricao}</Nome>
+                <Nome>({data.codigo}) - {data.decricao}</Nome>
                 <Unit>({data.unidade})</Unit>
                 <Price>R$ {data.preco_venda}</Price>
            </ProductWrapper>

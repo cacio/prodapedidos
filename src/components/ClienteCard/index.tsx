@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-import {ClienteDTO} from '../../dtos/ClienteDTO';
+import { Clientes as modelClientes } from '../../databases/model/Clientes';
 import {
         Container,
         Content,
@@ -29,7 +29,7 @@ interface ButtonSelected{
 }*/
 
 interface Props{
-    data:ClienteDTO,
+    data:modelClientes,
     setbuttonselected:(buttonselected: ButtonSelected)=>void;
     onPress:()=>void;
 }
