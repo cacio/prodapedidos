@@ -2,7 +2,7 @@ import React,{useEffect,useState} from 'react';
 import { HighlightCard,TransactionCardProps } from '../../components/HighlightCard';
 import { MenuCard,TransactionCardMenuProps } from '../../components/MenuCard';
 import { useAuth } from '../../hooks/auth';
-import { useNavigation } from '@react-navigation/core';
+import { useNavigation, useIsFocused } from '@react-navigation/core';
 import {useNetInfo} from '@react-native-community/netinfo';
 import { synchronize } from '@nozbe/watermelondb/sync';
 import { database } from '../../databases';
@@ -15,6 +15,7 @@ import { Pedido as modelPedido } from '../../databases/model/Pedido';
 import { PedidoDetalhe as modelPedidoDetalhe } from '../../databases/model/PedidoDetalhe';
 import { Q } from '@nozbe/watermelondb';
 import { number } from 'yup';
+import { Load } from '../../components/Load';
 
 export interface DataCliListProps extends TransactionCardProps {
     id:string;
@@ -33,15 +34,18 @@ export function Dashboard(){
     const {signOut,user} = useAuth();
     const netInfo = useNetInfo();
     const [menu,setMenu] = useState<DataListMenuCard[]>([]);
+    const [datacli,setDatacli] = useState<DataCliListProps[]>([])
     const [detalhes,setDestalhes] = useState([]);
-
+    const [loading,setLoading] = useState(true);
+    const [loadingCard,setLoadingCard] = useState(true); 
+    const screenIsFocus = useIsFocused();
     type NavigationProps = {
         navigate:(screen:string) => void;
      }
 
     const navigator = useNavigation<NavigationProps>();
 
-    const datacli: DataCliListProps[] = 
+    /*const datacli: DataCliListProps[] = 
             [
                 {
                     id:'1',
@@ -68,7 +72,7 @@ export function Dashboard(){
                     lastTransaction:"Última compra dia 13 de abril",
                 },
 
-            ];
+            ];*/
 
     
 
@@ -150,9 +154,97 @@ export function Dashboard(){
        return totalgeral;                 
     }
 
+
+    async function CardsVendidoMes() {
+           
+        const dataHoje  = new Date();
+        const dataIni   = String(format(new Date(),'Y-MM')+'-01');
+        const ultimoDia = String(format(new Date(dataHoje.getFullYear(), dataHoje.getMonth() + 1, 0),'Y-MM-dd'));
+        const detalheCollection = database.get<modelPedidoDetalhe>('pedidodetalhe');
+        const clienteCollection = database.get<modelClientes>('clientes');
+        const pedidoCollection  = database.get<modelPedido>('pedido');
+        const PedidosMes        = await pedidoCollection.query(
+            Q.where('data_pedido',Q.gte(dataIni)),
+            Q.sortBy('codigo_cliente', Q.desc),
+            
+        ).fetch();
+         
+        const clientes          = await clienteCollection.query().fetch();
+        const detalhepedido     = await detalheCollection.query().fetch();
+        let xcli     = "";
+        let xcli2     = "";    
+        let contador = 0;    
+        let arr:DataCliListProps[]  = [];
+        let total = 0;
+        let codcli = "";
+        PedidosMes.forEach(async (itens:modelPedido)=>{
+
+            
+            if(itens.codigo_cliente != xcli2){
+                xcli2 = itens.codigo_cliente;
+                
+                if(contador > 0){
+                    
+                    const lastTransaction = new Date(
+                        Math.max.apply(Math,PedidosMes
+                            .map(transaction => transaction.codigo_cliente == codcli ? addDays(new Date(transaction.data_pedido),1).getTime():0)));
+                    const getcliente = clientes.filter(itemcli=>itemcli.CODIGO == codcli);                
+                    arr.push({
+                        id:String(contador),
+                        type:"up", 
+                        nome:getcliente[0].NOME, 
+                        fantasia:getcliente[0].FANTASIA, 
+                        amount : `R$ ${parseFloat(String(total)).toLocaleString('pt-br',
+                        { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                        lastTransaction:`Última compra dia ${lastTransaction.getDate()} de ${lastTransaction.toLocaleString('pt-BR',{month:'long'})}`,
+                    });
+                }
+                total = 0;
+                codcli = "";
+            }
+
+
+            if(itens.codigo_cliente != xcli){
+                xcli = itens.codigo_cliente;
+                                
+            }
+
+            detalhepedido.forEach((itemd:modelPedidoDetalhe)=>{
+                if(itemd.pedido_id === itens.pedido_id ){
+                    
+                    const valor =  (Number(itemd.preco.replace(",",".")) * Number(itemd.qtd));
+                    const valordesc = Number(itemd.desconto);
+                    const vTotalFinal = Number(valor) - Number(itemd.desconto);         
+
+                    total += vTotalFinal;
+                }
+            }) 
+            codcli =itens.codigo_cliente; 
+            contador++;
+        });
+        const lastTransaction = new Date(
+            Math.max.apply(Math,PedidosMes
+                .map(transaction => transaction.codigo_cliente == xcli ? addDays(new Date(transaction.data_pedido),1).getTime():0)));
+                const getcliente = clientes.filter(itemcli=>itemcli.CODIGO == xcli);
+
+        arr.push({
+            id:String(contador),
+            type:"up", 
+            nome:getcliente[0].NOME, 
+            fantasia:getcliente[0].FANTASIA,  
+            amount : `R$ ${parseFloat(String(total)).toLocaleString('pt-br',
+            { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            lastTransaction:`Última compra dia ${lastTransaction.getDate()} de ${lastTransaction.toLocaleString('pt-BR',{month:'long'})}`,
+        });
+
+        //console.log(arr);
+        setDatacli(arr);
+        setLoadingCard(false);
+    }
+
     useEffect(()=>{
        
-       
+        let isMouted = true;
         async function DadosMenu(){
 
 
@@ -160,7 +252,7 @@ export function Dashboard(){
             const legnhtcliente = await clienteCollection.query().fetchCount();
                         
             const totaldia = await TotalPedidoDia();
-            console.log(totaldia);
+            
             const collectionMenu =  [
                 {
                     id:'1',
@@ -225,13 +317,16 @@ export function Dashboard(){
                     total:""
                 }
             ];
-    
-            setMenu(collectionMenu);
+            if(isMouted){
+                setMenu(collectionMenu);
+            }
+
+            setLoading(false); 
         }
         //TotalPedidoDia();
         DadosMenu();
-
-    },[])
+        CardsVendidoMes();
+    },[screenIsFocus])
 
     useEffect(()=>{
         if(netInfo.isConnected === true){
@@ -257,13 +352,15 @@ export function Dashboard(){
                 </UserWrapper>                
             </Header>
 
+           {loadingCard ? <Load/> : 
             <HighlightCards
                 data={datacli}
                 keyExtractor={item => item.id}
                 renderItem={({item})=> <HighlightCard data={item}/>}                
             />
-                           
+           }
 
+        {loading ? <Load/> :
             <MenuDashboard>                
                 <MenuDashboardList 
                     data={menu}
@@ -272,6 +369,7 @@ export function Dashboard(){
                 />
                
             </MenuDashboard>
+        }
         </Container>
     );
 }

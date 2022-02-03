@@ -7,6 +7,10 @@ import { Pedido as modelPedido } from '../../databases/model/Pedido';
 import { PedidoDetalhe as modelPedidoDetalhe } from '../../databases/model/PedidoDetalhe';
 import { Q } from '@nozbe/watermelondb';
 import {format,addDays } from 'date-fns';
+import {Ionicons} from '@expo/vector-icons';
+import { useNavigation,useRoute,useIsFocused } from '@react-navigation/core';
+import { useTheme } from 'styled-components';
+import { Load } from '../../components/Load';
 
 import {
  Container,
@@ -33,7 +37,9 @@ import {
  Status,
  TipoStatus,
  StatusText,
- PedidoFeitoList
+ PedidoFeitoList,
+ ButtonEnvPed,
+ TextEnvPed
 } from './styles';
 
 export interface StatusProps{
@@ -43,6 +49,7 @@ export interface StatusProps{
 }
 export interface PedidoProps{
     id:string;
+    codreta:string;
     tipo:string;
     nomecli:string;
     nomefant:string;
@@ -60,13 +67,20 @@ interface BoxYesNot{
 
 
 export function MeusPedidos() {
-    const [selpedido,setSelpedido] = useState<BoxYesNot[]>([{
-        key:'selecione',
-        name:'Selecione',
-    }]);
-
+    const [selpedido,setSelpedido] = useState<BoxYesNot[]>([]);
+    const [loading,setLoading] = useState(true);
     const [vtotalgeral,setVtotalgeral] = useState(0);
     const [pedidos,setPedidos] = useState<PedidoProps[]>([]);
+    const [btnhide,setBtnHide] = useState(false);
+    const theme = useTheme();
+    const screenIsFocus = useIsFocused();
+
+    type NavigationProps = {
+        navigate:(screen:string,{}?) => void;
+        goBack:()=>void;
+     }
+    
+    const navigator = useNavigation<NavigationProps>();
 
     const dataStatus:StatusProps[] = [
         {
@@ -87,7 +101,7 @@ export function MeusPedidos() {
 
     ];
 
-    function handlerSelectionPed(item:BoxYesNot){
+   function handlerSelectionPed(item:BoxYesNot){
 
         const itemn = {
             key:item.key,
@@ -120,12 +134,15 @@ export function MeusPedidos() {
         }
 
         setSelpedido(dataFormatted);
-        
-        
+
+       
+               
     }
 
-    function handlerClicadoPed(){
-        console.log(selpedido);
+    
+
+    function handlerClicadoPed(ped:PedidoProps){
+        navigator.navigate('DetailsPedido',{ped:ped});
     }
 
 
@@ -175,6 +192,7 @@ export function MeusPedidos() {
                     total:String(subtotal),
                     totaldesc:String(vDesconto),
                     totalfinal:String(vTotFinal),
+                    codreta:item.CODIGO_RETAGUARDA
                 })
                 
             });
@@ -186,61 +204,84 @@ export function MeusPedidos() {
 
 
     useEffect(()=>{
+        let isMouted = true;
         async function ListPeidos() {
-            const pedidoCollection  = database.get<modelPedido>('pedido');
-            const detalheCollection = database.get<modelPedidoDetalhe>('pedidodetalhe');
-            const collectionCliente = database.get<modelClientes>('clientes');
+            try {
+                const pedidoCollection  = database.get<modelPedido>('pedido');
+                const detalheCollection = database.get<modelPedidoDetalhe>('pedidodetalhe');
+                const collectionCliente = database.get<modelClientes>('clientes');
 
-            const  data:PedidoProps[]  = [];             
-            const dataDay =  String(format(new Date(),'Y-MM-dd')); 
+                const  data:PedidoProps[]  = [];             
+                const dataDay =  String(format(new Date(),'Y-MM-dd')); 
 
-            const listaPedido       = await pedidoCollection.query(
-                Q.where('data_pedido',dataDay)
-            ).fetch();
-            const detalhepedido     = await detalheCollection.query().fetch();
-            const datacli           = await collectionCliente.query().fetch();
-            let totalgeral = 0;
-            listaPedido.forEach(async (item:modelPedido)=>{
-                
-                const cliente  = datacli.filter((itemcli:modelClientes)=>itemcli.CODIGO == item.codigo_cliente);
+                const listaPedido       = await pedidoCollection.query(
+                    Q.where('data_pedido',dataDay)
+                ).fetch();
+                const detalhepedido     = await detalheCollection.query().fetch();
+                const datacli           = await collectionCliente.query().fetch();
+                let totalgeral = 0;
+                listaPedido.forEach(async (item:modelPedido)=>{
+                    
+                    const cliente  = datacli.filter((itemcli:modelClientes)=>itemcli.CODIGO == item.codigo_cliente);
 
-                let subtotal  = 0; 
-                let vDesconto = 0; 
-                let vTotFinal = 0; 
+                    let subtotal  = 0; 
+                    let vDesconto = 0; 
+                    let vTotFinal = 0; 
 
-                detalhepedido.forEach((itemd:modelPedidoDetalhe)=>{
-                    if(itemd.pedido_id === item.pedido_id ){
-                        const valor =  (Number(itemd.preco.replace(",",".")) * Number(itemd.qtd));
-                        const valordesc = Number(itemd.desconto);
-                        const vTotalFinal = Number(valor) - Number(itemd.desconto);
-                        subtotal +=valor;
-                        vDesconto +=valordesc;
-                        vTotFinal +=vTotalFinal;
+                    detalhepedido.forEach((itemd:modelPedidoDetalhe)=>{
+                        if(itemd.pedido_id === item.pedido_id ){
+                            const valor =  (Number(itemd.preco.replace(",",".")) * Number(itemd.qtd));
+                            const valordesc = Number(itemd.desconto);
+                            const vTotalFinal = Number(valor) - Number(itemd.desconto);
+                            subtotal +=valor;
+                            vDesconto +=valordesc;
+                            vTotFinal +=vTotalFinal;
 
-                        totalgeral += vTotalFinal;
-                    }
-                })    
-                
-                data.push({
-                    id:item.id,
-                    tipo:item.status,
-                    nomecli:cliente[0].NOME,
-                    nomefant:cliente[0].FANTASIA,
-                    dtemissao:item.data_pedido,
-                    dtentrega:item.data_entrega,
-                    total:String(subtotal),
-                    totaldesc:String(vDesconto),
-                    totalfinal:String(vTotFinal),
-                })
-                
-            });
+                            totalgeral += vTotalFinal;
+                        }
+                    })    
+                    
+                    data.push({
+                        id:item.id,
+                        tipo:item.status,
+                        nomecli:cliente[0].NOME,
+                        nomefant:cliente[0].FANTASIA,
+                        dtemissao:item.data_pedido,
+                        dtentrega:item.data_entrega,
+                        total:String(subtotal),
+                        totaldesc:String(vDesconto),
+                        totalfinal:String(vTotFinal),
+                        codreta:item.CODIGO_RETAGUARDA
+                    })
+                    
+                });
+                if(isMouted){
+                    setPedidos(data);
+                    setVtotalgeral(totalgeral);
+                }
 
-            setPedidos(data);
-            setVtotalgeral(totalgeral);
+                setLoading(false);
+            } catch (error) {
+                console.log(error);
+                setLoading(false);
+            }finally{
+                if(isMouted){
+                    setLoading(false);
+                }
+            }
+            
         }
 
         ListPeidos();
-    },[])
+    },[screenIsFocus])
+
+    useEffect(()=>{        
+        if(selpedido.length > 0){
+            setBtnHide(true);
+        }else{
+            setBtnHide(false);
+        }
+    },[selpedido])
 
  return(
    <Container>
@@ -291,7 +332,7 @@ export function MeusPedidos() {
                 />
                 
             </Header>
-
+            {loading ? <Load/> :    
             <PedidoFeitoList
                 data={pedidos}
                 keyExtractor={items=>items.id}
@@ -301,13 +342,20 @@ export function MeusPedidos() {
                         dados={item}
                         boxyesnot={selpedido}
                         setBoxYesNot={setSelpedido}
-                        onPress={handlerClicadoPed}                        
+                        onPress={()=>handlerClicadoPed(item)}                        
                         onLongPress={()=>handlerSelectionPed({key:item.id,name:'selecionado'})}
                    />
                 }
             />
+            }
 
-
+           {
+            btnhide ?   
+                <ButtonEnvPed>                        
+                        <Ionicons name="ios-cloud-upload-outline" size={32} color={theme.colors.shape}/>
+                        <TextEnvPed>ENVIAR PEDIDOS</TextEnvPed>
+                </ButtonEnvPed> : null
+            }
    </Container>
   );
 }

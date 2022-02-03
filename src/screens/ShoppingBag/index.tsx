@@ -3,6 +3,7 @@ import { useFocusEffect } from '@react-navigation/core';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacityProps} from 'react-native';
 import { ClienteDTO } from '../../dtos/ClienteDTO';
+import { CarrinhoDTO as CarrinhoProps } from '../../dtos/CarrinhoDTO';
 import { Clientes as modelClientes } from '../../databases/model/Clientes';
 import { Produtos as modelProdutos } from '../../databases/model/Produtos';
 import { useAuth } from '../../hooks/auth';
@@ -41,24 +42,13 @@ import { Q } from '@nozbe/watermelondb';
 
 
 interface Props extends TouchableOpacityProps{
-    cli:modelClientes;    
-}
-
-interface CarrinhoProps{
-    tipo: String;
-    quantidade:String;
-    codprod:String;
-    codigo:string;
-    nomeprod:String;
-    preco:String;
-    peso: string;
-    subtotal:string;
-    unidade:String;
-    peso_medio:String;
+    cli:modelClientes;
+    tipo:string;
+    idped?:string;    
 }
 
 
-export function ShoppingBag({cli}:Props) {
+export function ShoppingBag({cli,tipo,idped}:Props) {
     const {user}                 = useAuth();
     const [loading,setLoading]   = useState(true); 
     const [total,setTotal]       = useState('0'); 
@@ -141,7 +131,9 @@ export function ShoppingBag({cli}:Props) {
 
     function RedirectCheckout(){
         const data = {
-            cli:cli         
+            cli:cli,
+            tipo:tipo,
+            idped:idped         
         }
         navigator.navigate('checkout',data);
     }
@@ -201,12 +193,17 @@ export function ShoppingBag({cli}:Props) {
                     <TotalPrice>R$ {total}</TotalPrice>
                 </ContentFooter>              
             </Footer>
-            : <CarrinhoEmpty/>
+            : null
+            }
+
+            {
+                carrinho.length === 0 ?
+                <CarrinhoEmpty/> : null
             }
 
             {carrinho.length > 0 &&
             <ButtonContent>
-                <Button onPress={()=>RedirectCheckout()} title="FINALIZAR" />
+                <Button onPress={()=>RedirectCheckout()} title={tipo === 'alterar' ? 'FINALIZAR ALTERAÇÃO':'FINALIZAR'} />
             </ButtonContent>
             }
             

@@ -32,7 +32,7 @@ import { database } from '../../databases';
 
 export function Clientes(){
     const {user} = useAuth();
-
+    const [searchText,setSearchText] = useState('');
     const [loading,setLoading] = useState(true); 
     const [clients,setclients] = useState<modelClientes[]>([]);
     const [optionfilter,setOptionfilter] = useState({
@@ -52,6 +52,8 @@ export function Clientes(){
         navigate:(screen:string,{}?) => void;        
      }
 
+    
+
     const navigator = useNavigation<NavigationProps>();
 
     function HandlerPrevHome(){        
@@ -70,6 +72,33 @@ export function Clientes(){
         navigator.navigate('ProuctView',{cli:clients});
 
     }
+    let isMouted = true;
+    async function fecthClient() {
+            
+        try {
+           
+            const clienteCollection = database.get<modelClientes>('clientes');
+            const cliente = await clienteCollection.query().fetch();
+           
+           /* await database.write(async ()=>{
+                const cliSelected = await clienteCollection.find('qc5f4sv4sh1b9v4r')
+                await cliSelected.destroyPermanently();                
+            });*/
+
+            
+            if(isMouted){
+               setclients(cliente);
+            }
+            setLoading(false);
+        } catch (error) {
+            console.log(error);                
+            setLoading(false);
+        }finally{
+            if(isMouted){
+                setLoading(false);
+            }
+        }
+    }
 
     useEffect(()=>{
         if(buttonCli.id != ''){
@@ -78,36 +107,28 @@ export function Clientes(){
     },[buttonCli])
 
     useEffect(()=>{  
-        let isMouted = true;
-        async function fecthClient() {
+        
+        if(searchText === ''){
+            fecthClient();
+        }else{
             
-            try {
-               
-                const clienteCollection = database.get<modelClientes>('clientes');
-                const cliente = await clienteCollection.query().fetch();
-               
-               /* await database.write(async ()=>{
-                    const cliSelected = await clienteCollection.find('qc5f4sv4sh1b9v4r')
-                    await cliSelected.destroyPermanently();                
-                });*/
+            setclients(
+                clients.filter((item:modelClientes)=>{
+                    if(optionfilter.key === '1'){
+                        return (item.FANTASIA.toLowerCase().indexOf(searchText.toLowerCase()) > -1);
+                    }else if(optionfilter.key === '2'){
+                        return (item.NOME.toLowerCase().indexOf(searchText.toLowerCase()) > -1);
+                    }else{
+                        return (item.CNPJ_CPF.toLowerCase().indexOf(searchText.toLowerCase()) > -1);
+                    }
+                })
+            );
 
-                
-                if(isMouted){
-                   setclients(cliente);
-                }
-                setLoading(false);
-            } catch (error) {
-                console.log(error);                
-                setLoading(false);
-            }finally{
-                if(isMouted){
-                    setLoading(false);
-                }
-            }
+
         }
-        fecthClient();
+
         //fecthClients();
-    },[]);
+    },[searchText]);
  
     
     return(
@@ -137,7 +158,12 @@ export function Clientes(){
                         <Iconfilter name="filter"/>
                     </IconWrapper>   
                     <Field>
-                       <InputFilter placeholder="Buscar Cliente" placeholderTextColor="#fff" />
+                       <InputFilter 
+                            placeholder="Buscar Cliente" 
+                            placeholderTextColor="#fff" 
+                            value={searchText}
+                            onChangeText={setSearchText}
+                        />
                     </Field> 
                     <ButtonTypeFilter onPress={handlerOpenFilterModalize}>
                         <IconTypeFilter name="chevron-down"/>

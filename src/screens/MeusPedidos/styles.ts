@@ -5,6 +5,7 @@ import { TouchableOpacity } from 'react-native';
 import {getStatusBarHeight,getBottomSpace} from 'react-native-iphone-x-helper';
 import {Feather,FontAwesome} from '@expo/vector-icons';
 import {StatusProps,PedidoProps} from '.';
+import {RectButton} from 'react-native-gesture-handler';
 
 interface TipoStatus{
     colors:Number;
@@ -199,4 +200,26 @@ export const PedidoFeitoList = styled(
     ).attrs({
         showsVerticalScrollIndicator:false
     })`
+`;
+
+
+export const ButtonEnvPed = styled(RectButton)`
+
+    width: 90%;
+    height: 60px;
+    background-color: ${({theme})=>theme.colors.primary};
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-radius:30px;
+    position: absolute;
+    bottom:13px;
+    right:22px;
+
+`;
+
+export const TextEnvPed = styled.Text`
+    color:${({theme})=>theme.colors.shape};
+    font-family: ${({theme})=>theme.fonts.medium};
+    margin: 0px 10px;
 `;

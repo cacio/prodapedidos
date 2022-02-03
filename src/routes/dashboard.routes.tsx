@@ -11,6 +11,8 @@ import { checkout } from '../screens/checkout';
 import { Profile } from '../screens/Profile';
 import { MeusPedidos } from '../screens/MeusPedidos';
 import { Confirmation } from '../screens/Confirmation';
+import { DetailsPedido } from '../screens/DetailsPedido';
+import { ProductAlterView } from '../screens/ProductAlterView';
 
 export function RoutesStack(){
     return (
@@ -77,6 +79,26 @@ export function RoutesStack(){
         <Screen 
                 name="MeusPedidos" 
                 component={MeusPedidos}                 
+                options={{
+                    gestureEnabled:true,
+                    gestureDirection:'horizontal',
+                    headerMode:'screen'
+                }}
+            />
+
+        <Screen 
+                name="DetailsPedido" 
+                component={DetailsPedido}                 
+                options={{
+                    gestureEnabled:true,
+                    gestureDirection:'horizontal',
+                    headerMode:'screen'
+                }}
+            />
+
+        <Screen 
+                name="ProductAlterView" 
+                component={ProductAlterView}                 
                 options={{
                     gestureEnabled:true,
                     gestureDirection:'horizontal',

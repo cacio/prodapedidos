@@ -18,7 +18,8 @@ import {
  Total,
  TotalDesconto,
  TotalFinal,
- DetalhePedido
+ DetalhePedido,
+ CodigoRetaguarda
 } from './styles';
 
 interface PedidoProps extends TouchableOpacityProps{
@@ -31,6 +32,7 @@ interface PedidoProps extends TouchableOpacityProps{
     total:string;
     totaldesc:string;
     totalfinal:string;
+    codreta:string;
 }
 
 interface BoxYesNot{
@@ -87,6 +89,7 @@ export function PedidoCard({dados,boxyesnot,setBoxYesNot,...rest}:DadosPedidosPr
                 </InfoCliente>
                 <DetalhePedido>
                     <InfoDatas>
+                        <CodigoRetaguarda>Número: {dados.codreta}</CodigoRetaguarda>
                         <Emissao>Emissão: {formatDate(dados.dtemissao)}</Emissao>
                         <Entrega>Entrega: {formatDate(dados.dtentrega)}</Entrega>
                     </InfoDatas>

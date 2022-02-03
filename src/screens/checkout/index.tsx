@@ -1,5 +1,5 @@
 import React,{useState,useEffect} from 'react'; 
-import { Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import { useRoute,useNavigation } from '@react-navigation/native';
@@ -54,16 +54,18 @@ import { Pedido } from '../../databases/model/Pedido';
 import { CondicoesPagamento as modelCondicoesPagamento } from '../../databases/model/CondicoesPagamento';
 import { PedidoDetalhe } from '../../databases/model/PedidoDetalhe';
 import { CarrinhoDTO as CarrinhoProps } from '../../dtos/CarrinhoDTO';
-
+import { Pedido as modelPedido } from '../../databases/model/Pedido';
 
 interface ParansData{
     cli:ClienteDTO;
+    tipo:string;
+    idped:string;
 }
 
 export function checkout() {
 const route                                          = useRoute();
 const {user}                                         = useAuth();
-const {cli}                                          = route.params as ParansData;
+const {cli,tipo,idped}                               = route.params as ParansData;
 const [SelectedDateTime,setSelectedDateTime]         = useState(addDays(new Date(),1));     
 const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 const [total,setTotal]                               = useState('0');
@@ -210,6 +212,9 @@ async function handlerInsertpedido(){
             });
         });
         
+
+        await AsyncStorage.removeItem(dataKey);
+        
         navegation2.navigate('Confirmation',{      
             nextScreenRoute:'home',
             title:'Pedido Criado com sucesso!',
@@ -218,15 +223,140 @@ async function handlerInsertpedido(){
           });
 
     } catch (error) {
-        throw new Error(''+error+'');
+        Alert.alert("Não foi possivel gravar seu pedido");
     }
 
 }
 
 
+async function handlerAlterarPedido(){
+
+    try {
+        const dataKey                = `@prodapedido:transactions_user:${user.id}:cli:${cli.CODIGO}`;
+        const dataPed                = await AsyncStorage.getItem(dataKey);
+        const currentData            = dataPed ? JSON.parse(dataPed) : [];
+        const data = {            
+            data_pedido:format(new Date(),'Y-MM-dd',{
+                locale:ptBR,
+            }),
+            codigo_cliente:cli.CODIGO,
+            data_entrega: format(SelectedDateTime,'Y-MM-dd',{
+                locale:ptBR,
+            }),
+            hora_pedido:format(new Date(),'HH:mm:ss',{
+                locale:ptBR,
+            }),
+            codigo_usuario:user.id,
+            codigo_vendedor:user.codrepre,
+            status:'1',
+            prazo1:cli.PRAZO1,
+            prazo2:cli.PRAZO2,
+            prazo3:cli.PRAZO3,
+            prazo4:cli.PRAZO4,
+            prazo5:cli.PRAZO5,
+            obs:getValues('obs'),
+            valor_desconto:0,
+            id_tabela_preco:'0',
+            retirada:'1',
+            cnpj_emp:user.cnpj_emp
+        }
+        await database.write(async ()=>{
+            const pedidos = await database.get<modelPedido>('pedido').find(idped);
+            await pedidos.update(()=>{
+                pedidos.data_pedido       = data.data_pedido;
+                pedidos.codigo_cliente    = data.codigo_cliente;
+                pedidos.data_entrega      = data.data_entrega;
+                pedidos.hora_pedido       = data.hora_pedido;
+                pedidos.codigo_usuario    = data.codigo_usuario;
+                pedidos.codigo_vendedor   = data.codigo_vendedor;
+                pedidos.status            = data.status;
+                pedidos.prazo1            = String(data.prazo1);
+                pedidos.prazo2            = String(data.prazo2);
+                pedidos.prazo3            = String(data.prazo3);
+                pedidos.prazo4            = String(data.prazo4);
+                pedidos.prazo5            = String(data.prazo5);
+                pedidos.obs               = data.obs;
+                pedidos.valor_desconto    = String(data.valor_desconto);
+                pedidos.id_tabela_preco   = data.id_tabela_preco;
+                pedidos.retirada          = data.retirada;
+                pedidos.cnpj_emp          = data.cnpj_emp;
+            })
+        });
+        
+        const pedidoCollection  = database.get<modelPedido>('pedido');
+        const listaPedido = await pedidoCollection.query(
+            Q.where('id',idped)
+        ).fetch();
+
+        const pedidodetalhe = database.get<PedidoDetalhe>('pedidodetalhe');
+
+        await database.write(async ()=>{
+
+            const listdet = await pedidodetalhe.query(
+                Q.where('pedido_id',listaPedido[0].pedido_id)
+            ).fetch();
+
+            listdet.forEach(async (item:PedidoDetalhe)=>{
+                const pedidosdet = await database.get<PedidoDetalhe>('pedidodetalhe').find(item.id);
+                await pedidosdet.destroyPermanently();
+            })
+        });
+
+
+        await database.write(async ()=>{
+            currentData.map( async (item:CarrinhoProps)=>{            
+                await pedidodetalhe.create((newPedidoDetalhe)=>{
+                    newPedidoDetalhe.pedido_id = listaPedido[0].pedido_id;
+                    newPedidoDetalhe.qtd       = String(item.quantidade);
+                    newPedidoDetalhe.preco     = String(item.preco);
+                    newPedidoDetalhe.cod_prod  = String(item.codigo);
+                    newPedidoDetalhe.pc        = item.peso;
+                    newPedidoDetalhe.desconto  = '0';
+                    newPedidoDetalhe.obs       = String(item.obs);
+                    newPedidoDetalhe.tipo_pc_qtd = String(item.tipo);
+                })
+            });
+        });
+        
+
+        await AsyncStorage.removeItem(dataKey);
+        
+        navegation2.navigate('Confirmation',{      
+            nextScreenRoute:'MeusPedidos',
+            title:'Pedido Criado com sucesso!',
+            message:`Seu pedido foi Alterado\nagora clique para voltar a fazer mais pedidos`,
+            buttontitle:"Voltar"
+          });
+
+    } catch (error) {
+        console.log(error);
+        Alert.alert("Não foi possivel alterar");
+    }
+
+}
+
+async function getDadosAlteracao() {
+    //console.log('teste');
+    const pedidoCollection  = database.get<modelPedido>('pedido');
+    const listaPedido = await pedidoCollection.query(
+        Q.where('id',idped)
+    ).fetch();
+      const dateformat = new Date(listaPedido[0].data_entrega);
+       console.log(dateformat);
+    
+    setSelectedDateTime(addDays(dateformat,1));
+    setValue('obs',listaPedido[0].obs);
+
+}
+
 useEffect(()=>{
     TotaisShopping();
     getCondicoesPagamento();
+
+    if(tipo === 'alterar'){
+        getDadosAlteracao();
+    }
+
 },[])
 
 
@@ -301,7 +431,7 @@ useEffect(()=>{
                 </ContentFooter>              
             </Footer>
 
-            <Button title="FAZER PEDIDO" onPress={handlerInsertpedido} />
+            <Button title={tipo == 'alterar' ? "FAZER ALTERAÇÃO PEDIDO":"FAZER PEDIDO"} onPress={tipo == 'alterar' ? handlerAlterarPedido : handlerInsertpedido} />
        </Content> 
        
        <DateTimePickerModal

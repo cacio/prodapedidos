@@ -37,7 +37,7 @@ import { useAuth } from '../../hooks/auth';
 import { Produtos as modelProdutos } from '../../databases/model/Produtos';
 import { Clientes as modelClientes } from '../../databases/model/Clientes';
 import { database } from '../../databases';
-
+import { Q } from '@nozbe/watermelondb';
 interface Params{
     cli:modelClientes
 }
@@ -47,10 +47,13 @@ LogBox.ignoreLogs([
 ]);
 
 export function ProductView() {
+    const perPage = 5;
     const {user}               = useAuth();
     const [loading,setLoading] = useState(true); 
     const [product,setProduct] = useState<modelProdutos[]>([]);     
     const [carrinhoLength,setCarrinhoLength] = useState([]);
+    const [searchText,setSearchText] = useState('');
+    const [page,setPage]             = useState(1);
     const route  = useRoute();
     
     const { cli }    = route.params as Params;
@@ -58,6 +61,7 @@ export function ProductView() {
     const photoPadrao = `https://ui-avatars.com/api/?name=${cli.NOME}&length=1`;
     const theme = useTheme();
     const modalizeRef      = useRef<Modalize>(null);
+   
 
     type NavigationProps = {
         navigate:(screen:string,{}?) => void;        
@@ -85,31 +89,36 @@ export function ProductView() {
         modalizeRef.current?.close();
     }
 
-    useEffect(()=>{
-        
-        let isMouted = true;
+    let isMouted = true;
 
-        async function fechtProduto() {
-            try {
+    async function fechtProduto() {
+        try {
+            
+            const colectionProdutos = database.get<modelProdutos>('produtos');
+            const dataproduto = await colectionProdutos.query(
+             /*   Q.skip(perPage),
+                Q.take(page)*/
                 
-                const colectionProdutos = database.get<modelProdutos>('produtos');
-                const dataproduto = await colectionProdutos.query().fetch();
-               
-                if(isMouted){
-                    setProduct(dataproduto);   
-                }
-                setLoading(false); 
-               // console.log(data);
-            } catch (error) {
-                console.log(error);
+            ).fetch();
+            
+                         
+            if(isMouted){
+                setProduct(dataproduto);   
+                setPage(page + 1);
+            }
+            setLoading(false); 
+            
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+        }finally{
+            if(isMouted){
                 setLoading(false);
-            }finally{
-                if(isMouted){
-                    setLoading(false);
-                }
             }
         }
+    }
 
+    useEffect(()=>{        
         async function getLengthCarrinho() {
             const dataKey     = `@prodapedido:transactions_user:${user.id}:cli:${cli.CODIGO}`;
             const data        = await AsyncStorage.getItem(dataKey);
@@ -117,11 +126,29 @@ export function ProductView() {
             setCarrinhoLength(currentData);                
         }    
 
-        fechtProduto();
+        
         getLengthCarrinho();
-
         
     },[carrinhoLength.length])
+
+
+    useEffect(()=>{
+        if(searchText === ''){
+            fechtProduto();
+        }else{
+            setProduct(
+                product.filter((item:modelProdutos)=>{
+                    if(item.decricao.toLowerCase().indexOf(searchText) > -1){
+                        return true;
+                    }else if(item.codigo.indexOf(searchText) > -1){
+                        return true;
+                    }else{return false;} 
+                })
+            );
+        }
+        
+
+    },[searchText])
 
  return(
    <Container>
@@ -151,6 +178,8 @@ export function ProductView() {
                        <InputFilter 
                             placeholder="Buscar produto" 
                             placeholderTextColor="#fff" 
+                            value={searchText}
+                            onChangeText={setSearchText}
                         />
                     </Field> 
                     <ButtonTypeFilter onPress={()=>{}}>
@@ -165,6 +194,9 @@ export function ProductView() {
                 data={product}
                 keyExtractor={item => item.id}
                 renderItem={({item})=> <ProdutoCard  onPress={()=>handlerDetailsProduct(item)} data={item}  />}
+                //onEndReached={fechtProduto}
+                //onEndReachedThreshold={0.1}
+                //ListFooterComponent={loading ? <Load/> :null }
               />  
             }
 
@@ -173,7 +205,7 @@ export function ProductView() {
             </MyCarButton>
 
             <Modalize ref={modalizeRef}>
-                <ShoppingBag cli={cli}  />
+                <ShoppingBag cli={cli} tipo='novo'/>
             </Modalize>
 
    </Container>

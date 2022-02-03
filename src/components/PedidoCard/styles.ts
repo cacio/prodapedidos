@@ -102,6 +102,12 @@ export const Entrega = styled.Text`
     font-family: ${({theme})=> theme.fonts.medium};
 `;
 
+export const CodigoRetaguarda = styled.Text`
+    font-size: ${RFValue(12)}px;
+    color: ${({theme})=> theme.colors.title};
+    font-family: ${({theme})=> theme.fonts.medium};
+`;
+
 export const InfoTotais = styled.View``;
 
 export const Total = styled.Text`
