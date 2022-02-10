@@ -43,9 +43,10 @@ async function handlerLogin(){
                
         const password = senha;
 
-        signIn({email,password});
+       await signIn({email,password});
 
     } catch (error) {
+        
         if(error instanceof Yup.ValidationError){
             Alert.alert('Opa!',error.message);
         }else{

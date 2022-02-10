@@ -96,6 +96,7 @@ export function Dashboard(){
         await synchronize({
             database,
             pullChanges: async ({ lastPulledAt }) =>{
+                console.log("lastPulledAt: ",lastPulledAt);
                 const reponse = await api.get(`clientes/sync/pull?lastPulledVersion=${lastPulledAt || 0}`);
 
                 const {changes, latestVersion} = reponse.data;
@@ -226,18 +227,29 @@ export function Dashboard(){
             Math.max.apply(Math,PedidosMes
                 .map(transaction => transaction.codigo_cliente == xcli ? addDays(new Date(transaction.data_pedido),1).getTime():0)));
                 const getcliente = clientes.filter(itemcli=>itemcli.CODIGO == xcli);
+         if(getcliente[0]){
+            arr.push({
+                id:String(contador),
+                type:"up", 
+                nome:getcliente[0].NOME, 
+                fantasia:getcliente[0].FANTASIA,  
+                amount : `R$ ${parseFloat(String(total)).toLocaleString('pt-br',
+                { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                lastTransaction:`Última compra dia ${lastTransaction.getDate()} de ${lastTransaction.toLocaleString('pt-BR',{month:'long'})}`,
+            });
+        }       
+        
+        if(PedidosMes.length == 0){
+            arr.push({
+                id:'1',
+                type:"up", 
+                nome:'NENHUMA COMPRA', 
+                fantasia:'NENHUMA COMPRA',  
+                amount : 'R$ 0,00',
+                lastTransaction:`Nenhuma compra feita`
+            });
+        }
 
-        arr.push({
-            id:String(contador),
-            type:"up", 
-            nome:getcliente[0].NOME, 
-            fantasia:getcliente[0].FANTASIA,  
-            amount : `R$ ${parseFloat(String(total)).toLocaleString('pt-br',
-            { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-            lastTransaction:`Última compra dia ${lastTransaction.getDate()} de ${lastTransaction.toLocaleString('pt-BR',{month:'long'})}`,
-        });
-
-        //console.log(arr);
         setDatacli(arr);
         setLoadingCard(false);
     }
@@ -326,6 +338,7 @@ export function Dashboard(){
         //TotalPedidoDia();
         DadosMenu();
         CardsVendidoMes();
+        
     },[screenIsFocus])
 
     useEffect(()=>{

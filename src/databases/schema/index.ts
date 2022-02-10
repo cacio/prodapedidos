@@ -8,7 +8,7 @@ import { pedidoSchema } from './pedidoSchema';
 import { pedidodetalheSchema } from './pedidodetalheSchema';
 
 const schemas = appSchema({
-    version:11,
+    version:13,
     tables:[
         userSchema,
         clienteSchema,

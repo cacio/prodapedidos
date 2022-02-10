@@ -116,15 +116,15 @@ function AuthProvider({children}:AuthProviderProps){
 
     async function signIn({email,password}:SignInCredentials) {
 
-        try {
+         try {
             
             const response = await api.post('/auth',{
                 email:email,
                 passwd:password
             });
-    
+            
             const {token,usuario } = response.data;
-            //console.log(user);
+                        
             api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             setUserData({...usuario,token});
             
@@ -143,8 +143,8 @@ function AuthProvider({children}:AuthProviderProps){
                 })
             });
 
-        } catch (error) {
-            throw new Error(''+error+'');
+        } catch (error) {                    
+            throw new Error(String(error));
         }
 
         
