@@ -1,7 +1,8 @@
 import styled from "styled-components/native";
 import { RFValue } from 'react-native-responsive-fontsize';
 import {FlatList} from 'react-native';
-import {Feather} from '@expo/vector-icons';
+import { SwipeListView } from 'react-native-swipe-list-view';
+import {Feather,FontAwesome,MaterialIcons} from '@expo/vector-icons';
 import {getStatusBarHeight,getBottomSpace} from 'react-native-iphone-x-helper';
 import { TouchableOpacity } from 'react-native';
 import { Clientes as modelClientes } from '../../databases/model/Clientes';
@@ -29,21 +30,17 @@ export const Title = styled.Text`
 `;
 
 export const HeaderNavegation = styled.View`
-    padding: 0 24px;
-    margin-top: ${getStatusBarHeight() + RFValue(12)}px;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;   
-    border-color: ${({theme})=>theme.colors.secundary_light};
-    border-bottom-width: 1px;        
+    width:100%;
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:${getStatusBarHeight() + 18}px;  
+    padding:0 24px;
+    margin-bottom: 10px;        
 `;
 
 export const PrevHome = styled(TouchableOpacity)`    
-    border-radius: 10px;    
-    justify-content: center;
-    align-items: center; 
-    padding: 10px;
-    margin-bottom: 10px;
+   
 `;
 
 export const NavIcon = styled(Feather)`        
@@ -52,11 +49,11 @@ export const NavIcon = styled(Feather)`
 `;
 
 export const NavTitle = styled.Text`
-    flex:1;    
+      
     color: ${({theme})=>theme.colors.shape};
     font-size:${RFValue(20)}px;
     text-align: center;
-    margin-left: -50px;
+    margin-right: 110px;
     margin-bottom: 10px;
 `;
 
@@ -114,14 +111,14 @@ export const ButtonTypeFilter = styled(TouchableOpacity)`
 
 `;
 
-export const IconTypeFilter = styled(Feather)`
+export const IconTypeFilter = styled(FontAwesome)`
     font-size: ${RFValue(24)}px;
     text-align: left;  
     color: ${({theme})=>theme.colors.text};  
 `;
 
 export const ClientLista = styled(
-    FlatList as new ()=> FlatList<modelClientes>         
+    SwipeListView as new ()=> SwipeListView<modelClientes>         
     ).attrs({
     showsVerticalScrollIndicator:false,
     contentContainerStyle:{
@@ -129,4 +126,57 @@ export const ClientLista = styled(
     }
 })`  
     padding:5px 5px;     
+`;
+
+export const ContentButtons = styled.View`
+    flex:1 ;
+    flex-direction:row;
+    justify-content: space-between;
+    align-items:center ;
+    padding-left:15px;
+    margin-top:5px; 
+`;
+
+export const ButtonFatura = styled(TouchableOpacity)`
+    align-items:center ;
+    bottom:0px;
+    justify-content:center ;
+    position:absolute ;
+    top:0px;
+    width:75px;
+    right: 75px;
+    background-color: ${({theme})=>theme.colors.secundary};
+    border-width: 1px;
+    border-color: ${({theme})=> theme.colors.primary};
+`;
+
+export const ButtonDetalhe = styled(TouchableOpacity)`
+    align-items:center ;
+    bottom:0px;
+    justify-content:center ;
+    position:absolute ;
+    top:0px;
+    width:75px;
+    right: 0px;
+    background-color: ${({theme})=>theme.colors.primary};
+    border-width: 1px;
+    border-color: ${({theme})=> theme.colors.primary};
+    border-top-right-radius:5px;
+    border-bottom-right-radius:5px;
+`;
+
+export const DetalheText = styled.Text`
+    color: ${({theme})=> theme.colors.text_dark};
+    font-weight: bold;
+`;
+export const FatutaText  = styled.Text`
+    color: ${({theme})=> theme.colors.text_dark};
+    font-weight: bold;
+`;
+
+export const IconBotton = styled(MaterialIcons)`
+    font-size: ${RFValue(20)}px;
+    color: ${({theme})=> theme.colors.text_dark};
+    font-weight: 700;
+    margin-right: 5px;    
 `;

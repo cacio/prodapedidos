@@ -12,7 +12,8 @@ import {
  Estoque,
  Pc,
  PesoMedio,
- ProductWrapper
+ ProductWrapper,
+ LabelDetails
 } from './styles';
 
 
@@ -27,12 +28,19 @@ export function ProdutoCard({data,...rest}:Props) {
            <ProductWrapper>
                 <Nome>({data.codigo}) - {data.decricao}</Nome>
                 <Unit>({data.unidade})</Unit>
-                <Price>R$ {data.preco_venda}</Price>
+                <Price>R$ {parseFloat(String(data.preco_venda)).toLocaleString('pt-br',
+                    { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Price>
            </ProductWrapper>
            <Details>
-               <Estoque>Estoque: {data.estoque_atual}</Estoque>
-               <Pc>{data.pecas_estoque} PC</Pc>
-               <PesoMedio>{data.peso_medio} {data.unidade}</PesoMedio>
+               <LabelDetails>
+                    <Estoque>Estoque: {data.estoque_atual}</Estoque>
+               </LabelDetails>
+               <LabelDetails>
+                    <Pc>{data.pecas_estoque} PC</Pc>
+               </LabelDetails>
+               <LabelDetails>
+                    <PesoMedio>{data.peso_medio} {data.unidade}</PesoMedio>
+               </LabelDetails>
            </Details>
        </Product>
    </Container>

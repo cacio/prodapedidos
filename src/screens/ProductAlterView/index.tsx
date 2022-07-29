@@ -10,6 +10,8 @@ import { Modalize } from 'react-native-modalize';
 import {Ionicons} from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Q } from '@nozbe/watermelondb';
+import { v4 as uuidv4 } from 'uuid';
+
 import {
  Container,
  Header,
@@ -126,6 +128,7 @@ async function handlerDadosAlteracao(){
         const peso   = itens.tipo_pc_qtd == '1' ? subtot : (Number(itens.qtd) * Number(xprod[0].peso_medio));
 
         newProdutoCarrinho.push({
+                id:uuidv4(),
                 tipo: itens.tipo_pc_qtd,
                 quantidade:itens.qtd,
                 codprod:xprod[0].id,

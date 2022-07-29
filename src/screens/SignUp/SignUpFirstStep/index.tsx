@@ -18,6 +18,8 @@ import { Bullet } from '../../../components/Bullet';
 import { InputLogin } from '../../../components/Form/InputLogin';
 import { Button } from '../../../components/Form/Button';
 import { useTheme } from 'styled-components/native';
+import { InputMask } from '../../../components/Form/InputMask';
+import { api } from '../../../services/api';
 
 
 export function SignUpFirstStep() {
@@ -26,6 +28,7 @@ export function SignUpFirstStep() {
   const [email,setEmail]                 = useState('');
   const [codrepre,setCodrepre]           = useState('');
   const [driverLicense,setDriverLicense] = useState('');
+  const [cnpjcpf,setCnpjcpf]             = useState('');
 
   const theme = useTheme();
   type NavigationProps = {
@@ -38,24 +41,38 @@ export function SignUpFirstStep() {
   function handleNack(){
     navegation.goBack();
   }
+ 
 
   async function hanlerNextStep() {
     try {
       const scheme = Yup.object().shape({
-        codrepre:Yup.string().required('Código do represetante é obrigatório'),
+        codrepre:Yup.string().length(5,"Deve conter 5 números").required('Código do represetante é obrigatório'),
         email:Yup.string().email("E-Mail inválido").required('E-mail é obrigatório'),
-        nome:Yup.string().required('Nome é obrigatório')        
+        nome:Yup.string().required('Nome é obrigatório'),
+        cnpjcpf:Yup.string().required('CNPJ da empresa é obrigatório')        
       });
 
-      const data = {nome,email,codrepre};
+      const data = {nome,email,codrepre,cnpjcpf};
       await scheme.validate(data);
-
-      navegation2.navigate('SignUpSecondStep',{user:data});
+      
+      const vdata = await api.post('/usuarios/verifica',{
+                  cnpj_emp:cnpjcpf.replace(/\D/g, ""),
+                  cod_repre:codrepre
+                  }
+                 );
+      const {message,status}  = vdata.data;
+      
+      if(status == 'error'){
+        Alert.alert('Opa!',message);
+      }else{
+        navegation2.navigate('SignUpSecondStep',{user:data});
+      }
+      
     } catch (error) {
       if(error instanceof Yup.ValidationError){
           Alert.alert('Opa!',error.message);
       }
-
+      //console.log(error);
     }
       
   }
@@ -86,6 +103,18 @@ export function SignUpFirstStep() {
 
       <Form>
         <FormTitle>1. Dados</FormTitle>
+        
+        <InputMask
+          iconName="briefcase"
+          mask='cnpj'
+          maxLength={18}
+          placeholder="CNPJ Empresa"
+          keyboardType="numeric"
+          inputMaskChange={(text:string)=>setCnpjcpf(text)}
+          values={cnpjcpf}        
+          value={cnpjcpf}
+        />
+
         <InputLogin
           iconName="user"
           placeholder="Nome"
@@ -106,6 +135,7 @@ export function SignUpFirstStep() {
           placeholder="Código Representante"
           keyboardType="numeric"
           onChangeText={setCodrepre}
+          maxLength={5}
           value={codrepre}
         />
       

@@ -74,7 +74,7 @@ export const HighlightCards = styled(
 })`
     width: 100%;
     position: absolute;
-    margin-top: ${RFPercentage(20)}px;
+    margin-top: ${RFPercentage(22)}px;
 `;
 
 export const MenuDashboard = styled.View`

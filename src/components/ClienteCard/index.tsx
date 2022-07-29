@@ -44,24 +44,13 @@ export function ClienteCard({data,setbuttonselected,onPress}:Props){
 
        return(
         <Container onPress={onPress}>
-            <Content>
+            <Content tpsn={`${data.ATIVO}`}>
                 <PhotoWrapper>
-                    <Photo source={{ uri: data.foto === '' ? `https://ui-avatars.com/api/?name=${data.NOME}&length=1`: data.foto}}/>
-                    <LabelAtivo>{data.BLOQUEADO_SN}</LabelAtivo>
+                    <Photo source={{ uri: data.foto === '' ? `https://ui-avatars.com/api/?name=${data.NOME}&length=1`: data.foto}}/>                    
                 </PhotoWrapper>
                 <InfoCliente>
                       <Nome>{data.NOME}</Nome>  
-                      <NomeFantasia>{data.FANTASIA}</NomeFantasia>
-                     <ContentAction>
-                          <Botton onPress={()=>handleOptionSelect({ id:data.CODIGO,tipo:'dados'})}>
-                               <IconBotton name="edit-2" /> 
-                              <Name>Editar</Name>
-                          </Botton>
-                          <Botton onPress={()=>handleOptionSelect({id:data.CODIGO,tipo:'financ'})}>
-                               <IconBotton name="file" /> 
-                              <Name>Financeiro</Name>
-                          </Botton> 
-                     </ContentAction>                                             
+                      <NomeFantasia>{data.FANTASIA}</NomeFantasia>                                                                  
                  </InfoCliente>   
             </Content>
         </Container>

@@ -1,7 +1,11 @@
 import { RFValue } from "react-native-responsive-fontsize";
-import styled from "styled-components/native";
+import styled,{css} from "styled-components/native";
 import {Image,TouchableOpacity} from 'react-native';
 import {Feather} from '@expo/vector-icons';
+
+interface PropsTipoSN{
+    tpsn:string;
+}
 
 export const Container = styled(TouchableOpacity)`  
     width: 100%;
@@ -10,7 +14,7 @@ export const Container = styled(TouchableOpacity)`
     align-items: center;
 `;
 
-export const Content = styled.View`   
+export const Content = styled.View<PropsTipoSN>`   
     width: 100%; 
     flex-direction: row;
     justify-content: space-between;
@@ -20,8 +24,20 @@ export const Content = styled.View`
     padding: 19px 23px;
     padding-bottom: ${RFValue(25)}px;    
     margin-top:5px;        
-    border-left-width:1px;
-    border-left-color: ${({theme})=> theme.colors.primary}; 
+    border-left-width:2px;
+    
+    ${({tpsn})=> tpsn === 'S' && css`
+        border-left-color: ${({theme})=> theme.colors.success}; 
+    `}
+    
+    ${({tpsn})=> tpsn === 'N' && css`
+        border-left-color: ${({theme})=> theme.colors.attention}; 
+    `}
+
+    ${({tpsn})=> tpsn === '' && css`
+        border-left-color: ${({theme})=> theme.colors.primary}; 
+    `}
+
 `;
 
 export const PhotoWrapper = styled.View``;

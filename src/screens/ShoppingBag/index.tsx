@@ -62,7 +62,7 @@ export function ShoppingBag({cli,tipo,idped}:Props) {
 
     const navigator = useNavigation<NavigationProps>();
 
-    async function EditaProdutoCarrinho(cod:string) {
+    async function EditaProdutoCarrinho(cod:string,iditem:string) {
 
         try {
 
@@ -73,7 +73,8 @@ export function ShoppingBag({cli,tipo,idped}:Props) {
 
             const data = {
                 cli:cli,
-                product:dataproduto[0]
+                product:dataproduto[0],
+                iditem
             }
 
             navigator.navigate('DetailsProduct',data);
@@ -89,7 +90,7 @@ export function ShoppingBag({cli,tipo,idped}:Props) {
     async function getShoppingBag() {
         const data = await AsyncStorage.getItem(dataKey);
         const currentData = data ? JSON.parse(data) : [];
-
+        
         const expansiveTotal = currentData.reduce((acumullator:number,expensive:CarrinhoProps)=>{                              
             return acumullator + Number(expensive.subtotal.replace(/[^0-9,]*/g, '').replace(',', '.'));
        },0);
@@ -109,7 +110,7 @@ export function ShoppingBag({cli,tipo,idped}:Props) {
             const currentData = data ? JSON.parse(data) : [];
            
             const expensive = currentData.filter((expensive:CarrinhoProps)=>
-                expensive.codprod !== cod
+                expensive.id !== cod
             );
 
             
@@ -157,15 +158,16 @@ export function ShoppingBag({cli,tipo,idped}:Props) {
             {loading 
                 ?<Load/> 
                 :carrinho.map((item:CarrinhoProps) =>{
-                            //console.log(Number(item.codprod));
-                            return <Content key={Number(item.codigo)}>
-                                <ItemCarrinho onPress={()=>EditaProdutoCarrinho(String(item.codprod))}>
+                            //console.log(item.id);
+                            return <Content key={item.id}>
+                                <ItemCarrinho onPress={()=>EditaProdutoCarrinho(String(item.codprod),item.id)}>
                                     <ProdutoWrapper>
                                         <Nome>{item.nomeprod} ({item.unidade})</Nome>
                                         <DetailsItem>
                                             <Peso>Peso: {item.peso} {item.unidade}</Peso>
                                             <PesoMedio>Media KG: {item.peso_medio}</PesoMedio>
-                                            <Price>Preço: {item.preco}</Price>
+                                            <Price>Preço: {parseFloat(String(item.preco)).toLocaleString('pt-br',
+                    { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Price>
                                         </DetailsItem>
                                     </ProdutoWrapper>                
                                     <TotalItem>
@@ -175,7 +177,7 @@ export function ShoppingBag({cli,tipo,idped}:Props) {
                                         <Subtotal>R$ {item.subtotal}</Subtotal>
                                     </TotalItem>                               
                                 </ItemCarrinho> 
-                                <IconRemove onPress={()=>removeProductCarrinho(String(item.codprod))}>
+                                <IconRemove onPress={()=>removeProductCarrinho(String(item.id))}>
                                         <Icone name="x-circle" />
                                 </IconRemove>          
                             </Content>

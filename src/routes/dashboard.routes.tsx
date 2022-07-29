@@ -13,6 +13,10 @@ import { MeusPedidos } from '../screens/MeusPedidos';
 import { Confirmation } from '../screens/Confirmation';
 import { DetailsPedido } from '../screens/DetailsPedido';
 import { ProductAlterView } from '../screens/ProductAlterView';
+import { CadastroCliente } from '../screens/CadastroCliente';
+import { CatalagoProduto } from '../screens/CatalagoProduto';
+import { ClienteCobrar } from '../screens/ClienteCobrar';
+import { Relatorio } from '../screens/Relatorio';
 
 export function RoutesStack(){
     return (
@@ -96,9 +100,49 @@ export function RoutesStack(){
                 }}
             />
 
-        <Screen 
+           <Screen 
                 name="ProductAlterView" 
                 component={ProductAlterView}                 
+                options={{
+                    gestureEnabled:true,
+                    gestureDirection:'horizontal',
+                    headerMode:'screen'
+                }}
+            />
+
+        <Screen 
+                name="CadastroCliente" 
+                component={CadastroCliente}                 
+                options={{
+                    gestureEnabled:true,
+                    gestureDirection:'horizontal',
+                    headerMode:'screen'
+                }}
+            />
+
+            <Screen 
+                name="CatalagoProduto" 
+                component={CatalagoProduto}                 
+                options={{
+                    gestureEnabled:true,
+                    gestureDirection:'horizontal',
+                    headerMode:'screen'
+                }}
+            />
+
+            <Screen 
+                name="ClienteCobrar" 
+                component={ClienteCobrar}                 
+                options={{
+                    gestureEnabled:true,
+                    gestureDirection:'horizontal',
+                    headerMode:'screen'
+                }}
+            />
+
+            <Screen 
+                name="Relatorio" 
+                component={Relatorio}                 
                 options={{
                     gestureEnabled:true,
                     gestureDirection:'horizontal',

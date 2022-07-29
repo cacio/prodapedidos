@@ -1,18 +1,19 @@
 import React,{useEffect,useState} from 'react';
+import { Alert } from 'react-native';
 import { HighlightCard,TransactionCardProps } from '../../components/HighlightCard';
 import { MenuCard,TransactionCardMenuProps } from '../../components/MenuCard';
 import { useAuth } from '../../hooks/auth';
 import { useNavigation, useIsFocused } from '@react-navigation/core';
-import {useNetInfo} from '@react-native-community/netinfo';
+import { useNetInfo } from '@react-native-community/netinfo';
 import { synchronize } from '@nozbe/watermelondb/sync';
 import { database } from '../../databases';
-import {format,addDays } from 'date-fns';
-
+import { format,addDays } from 'date-fns';
 import { Container,Header,UserInfo,Photo,User,UserGreeting,UserName,UserWrapper,Icon,HighlightCards,MenuDashboard,Title,MenuDashboardList,LogoutButton} from './styles';
 import { api } from '../../services/api';
 import { Clientes as modelClientes } from '../../databases/model/Clientes';
 import { Pedido as modelPedido } from '../../databases/model/Pedido';
 import { PedidoDetalhe as modelPedidoDetalhe } from '../../databases/model/PedidoDetalhe';
+import { Produtos as modelProdutos } from '../../databases/model/Produtos';
 import { Q } from '@nozbe/watermelondb';
 import { number } from 'yup';
 import { Load } from '../../components/Load';
@@ -45,37 +46,26 @@ export function Dashboard(){
 
     const navigator = useNavigation<NavigationProps>();
 
-    /*const datacli: DataCliListProps[] = 
-            [
-                {
-                    id:'1',
-                    type:"up", 
-                    nome:"Cacio renato da silva", 
-                    fantasia:"cacio", 
-                    amount : "R$ 17.400,00",
-                    lastTransaction:"Última compra dia 13 de abril",
-                },
-                {
-                    id:'2',
-                    type:"up", 
-                    nome:"Jorge da Rosa", 
-                    fantasia:"Mercado do Jorge", 
-                    amount : "R$ 19.400,00",
-                    lastTransaction:"Última compra dia 13 de abril",
-                },
-                {
-                    id:'3',
-                    type:"up", 
-                    nome:"Mercado e varejo do cristofer", 
-                    fantasia:"Mercadinho do Cristofer", 
-                    amount : "R$ 17.400,00",
-                    lastTransaction:"Última compra dia 13 de abril",
-                },
-
-            ];*/
-
-    
-
+      
+    async function handlerSignOut(){
+        Alert.alert(
+          'Tem certeza ?',
+          'Se você sair irá precisar de internet para conectar-se novamente.',
+          [
+            {
+              text:'Cancelar',
+              onPress:()=>{},
+              style:'cancel'
+            },
+            {
+              text:'Sair',
+              onPress:()=>signOut()
+            }
+          ]
+        );
+      
+        
+      }
     
 
     function handlerSelctedMenu(menu:String){
@@ -83,7 +73,17 @@ export function Dashboard(){
             navigator.navigate('Clientes');
         }else if(menu == '2'){
             navigator.navigate('MeusPedidos');
+        }else if(menu == '3'){
+            navigator.navigate('CadastroCliente');
+        }else if(menu == '4'){
+            navigator.navigate('CatalagoProduto');
+        }else if(menu == '5'){
+            navigator.navigate('ClienteCobrar');
+        }else if(menu == '6'){
+            navigator.navigate('Relatorio');
         }
+
+        
     }
 
     function Perfil(){        
@@ -108,6 +108,7 @@ export function Dashboard(){
             },
             pushChanges: async ({changes}) =>{
                 const usuarios = changes.usuarios;
+                const pedido   = changes.pedido;
                 console.log("### mandando pro backend ###");
                 if(usuarios.updated.length > 0){
                     
@@ -115,6 +116,14 @@ export function Dashboard(){
                     await api.post('usuarios/async',usuarios);
                 }
                 
+               /* if(pedido.created.length > 0){
+                    const pedidos = JSON.stringify(pedido);
+
+                    await api.post('pedido/async',pedido);
+                                        
+                }*/
+
+
             }
 
         });   
@@ -262,7 +271,10 @@ export function Dashboard(){
 
             const clienteCollection = database.get<modelClientes>('clientes');
             const legnhtcliente = await clienteCollection.query().fetchCount();
-                        
+
+            const produtoConllection = database.get<modelProdutos>('produtos');
+            const legnhtproduto = await produtoConllection.query().fetchCount();
+            
             const totaldia = await TotalPedidoDia();
             
             const collectionMenu =  [
@@ -305,7 +317,7 @@ export function Dashboard(){
                     },
                     title:"PRODUTOS", 
                     subtitle:"TOTAL PRODUTOS :", 
-                    total:"597"
+                    total:String(legnhtproduto)
                 },
                 {
                     id:'5',
@@ -359,7 +371,7 @@ export function Dashboard(){
                             <UserName>{user.name}</UserName>
                         </User> 
                     </UserInfo>
-                    <LogoutButton onPress={signOut}>
+                    <LogoutButton onPress={handlerSignOut}>
                         <Icon name="power"/>
                     </LogoutButton>
                 </UserWrapper>                

@@ -96,9 +96,10 @@ export function DetailsPedido() {
  }
 
  const navigator = useNavigation<NavigationProps>();
+ const nav       = useNavigation();
 
  function handleBack(){
-   navigator.goBack();
+    nav.goBack();
  }
  
  function handlerOptionChange(optionSelected:'dataDetals' | 'dataRestri'){

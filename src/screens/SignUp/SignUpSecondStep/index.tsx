@@ -21,7 +21,8 @@ interface Params{
   user:{
     nome:string;
     email:string;
-    codrepre:string
+    codrepre:string;
+    cnpjcpf:string;
   }
 }
 
@@ -61,7 +62,7 @@ export function SignUpSecondStep() {
       email:user.email,
       passwd:senha,
       photo:'',
-      cnpj_emp:'99999999999999',
+      cnpj_emp:user.cnpjcpf.replace(/\D/g, ""),
       cod_repre:user.codrepre
     }).then(()=>{
       

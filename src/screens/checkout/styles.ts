@@ -125,8 +125,9 @@ export const FormaPagamento = styled.View`
     height: ${RFValue(56)}px;
     background-color: ${({theme})=>theme.colors.shape};
     border-radius: 5px;
-    border-style:  dashed;
+    border-style:  solid;
     border-width: 1px;
+    border-color: ${({theme})=>theme.colors.borderinput};
     align-items: center;
     flex-direction: row;
     margin-bottom: 16px;
@@ -156,8 +157,9 @@ export const Prazos = styled.Text`
 export const ContentCarrinho = styled.View`
     width: 100%;       
     border-radius: 5px;
-    border-style:  dashed;
-    border-width: 1px;    
+    border-style:  solid;
+    border-width: 1px;  
+    border-color: ${({theme})=>theme.colors.borderinput};  
     margin-bottom: 16px;
 `;
 export const DetailsCarrinho = styled.ScrollView`

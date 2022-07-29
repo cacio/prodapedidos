@@ -1,4 +1,5 @@
 export interface CarrinhoDTO{
+    id:string;
     tipo: String;
     quantidade:String;
     codprod:String;

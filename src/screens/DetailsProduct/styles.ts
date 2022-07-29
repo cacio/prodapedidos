@@ -1,24 +1,36 @@
 import { RFValue } from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native'; 
 import { TextInput } from 'react-native';
+import {getStatusBarHeight} from 'react-native-iphone-x-helper';
+
 export const Container = styled.View`
  flex: 1; 
  background-color: ${({theme})=>theme.colors.background};
 `;
 
 export const Header = styled.View`
-    width: 100%;
-    height: ${RFValue(113)}px;
-    background-color: ${({theme})=>theme.colors.primary};
-    align-items: center;
     justify-content: flex-end;
-    padding-bottom: 19px;
+    align-items: center;
+    width: 100%;    
+    background-color: ${({theme})=>theme.colors.primary};        
 
 `;
+
+export const HeaderNavegation = styled.View`
+    width:100%;
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:${getStatusBarHeight() + 18}px;  
+    padding:0 24px;
+    margin-bottom: 10px;
+`;
+
 export const Title  = styled.Text`
    font-family: ${({theme})=>theme.fonts.regular};
    color: ${({theme})=>theme.colors.shape};
-   font-size:${RFValue(18)}px;;
+   font-size:${RFValue(18)}px;
+   margin-right:100px;
 `;
 
 export const Content = styled.ScrollView`

@@ -1,6 +1,6 @@
 import React,{useEffect,useState,useRef} from 'react'; 
-import { LogBox } from 'react-native';
-import { useRoute,useNavigation } from '@react-navigation/native';
+import { LogBox,Alert } from 'react-native';
+import { useRoute,useNavigation,useIsFocused } from '@react-navigation/native';
 import { Modalize } from 'react-native-modalize';
 import {Ionicons} from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -25,7 +25,8 @@ import {
  FantasiaCli,
  DetailWrapper,
  ProdutoList,
- MyCarButton
+ MyCarButton,
+ ItemsPedido
 } from './styles';
 
 import { InputFilter } from '../../components/Form/InputFilter';
@@ -54,8 +55,9 @@ export function ProductView() {
     const [carrinhoLength,setCarrinhoLength] = useState([]);
     const [searchText,setSearchText] = useState('');
     const [page,setPage]             = useState(1);
+    const [tItems,setTItems]         = useState(0);  
     const route  = useRoute();
-    
+    const screenIsFocus = useIsFocused();
     const { cli }    = route.params as Params;
     
     const photoPadrao = `https://ui-avatars.com/api/?name=${cli.NOME}&length=1`;
@@ -67,16 +69,41 @@ export function ProductView() {
         navigate:(screen:string,{}?) => void;        
      }
 
-    const navigator = useNavigation<NavigationProps>();
+    const navigator  = useNavigation<NavigationProps>();
+    const navegation = useNavigation();
 
-    function handlerOpenCarrinho(){
+    function handleNack(){
+        if(tItems > 0){
+            Alert.alert(
+                'Tem certeza ?',
+                `Vejo que tem (${tItems}) itens no carrinho, Deseja Manter ou Limpar esse pedido ?`,
+                [
+                  {
+                    text:'Manter',
+                    onPress:()=>{navegation.goBack()},                    
+                  },
+                  {
+                    text:'Sair',
+                    onPress:()=>{RemoverCarrinho()},
+                    style:'cancel'
+                  }
+                ]
+              );
+        }else{
+            navegation.goBack()
+        }
+        
+      }
+
+    function handlerOpenCarrinho(){    
         modalizeRef.current?.open();
     }
     
     function handlerDetailsProduct(product:modelProdutos){            
         const data = {
             cli:cli,
-            product
+            product,
+            iditem:''
         }
         navigator.navigate('DetailsProduct',data);
     }
@@ -117,19 +144,24 @@ export function ProductView() {
             }
         }
     }
+    
+    async function RemoverCarrinho() {
+        const dataKey     = `@prodapedido:transactions_user:${user.id}:cli:${cli.CODIGO}`;        
+        await AsyncStorage.removeItem(dataKey);
+        navegation.goBack();
+    }
 
-    useEffect(()=>{        
-        async function getLengthCarrinho() {
-            const dataKey     = `@prodapedido:transactions_user:${user.id}:cli:${cli.CODIGO}`;
-            const data        = await AsyncStorage.getItem(dataKey);
-            const currentData = data ? JSON.parse(data) : [];
-            setCarrinhoLength(currentData);                
-        }    
+    async function getLengthCarrinho() {
+        const dataKey     = `@prodapedido:transactions_user:${user.id}:cli:${cli.CODIGO}`;
+        const data        = await AsyncStorage.getItem(dataKey);
+        const currentData = data ? JSON.parse(data) : [];
+        setCarrinhoLength(currentData); 
+        setTItems(currentData.length);               
+    }    
 
-        
-        getLengthCarrinho();
-        
-    },[carrinhoLength.length])
+    useEffect(()=>{                
+        getLengthCarrinho();        
+    },[carrinhoLength.length,screenIsFocus])
 
 
     useEffect(()=>{
@@ -148,13 +180,13 @@ export function ProductView() {
         }
         
 
-    },[searchText])
+    },[searchText,screenIsFocus])
 
  return(
    <Container>
        <Header>
                 <HeaderNavegation>
-                    <PrevHome onPress={()=>{}}>                    
+                    <PrevHome onPress={handleNack}>                    
                         <NavIcon name="arrow-left" />
                     </PrevHome>
                     <NavTitle>
@@ -183,7 +215,7 @@ export function ProductView() {
                         />
                     </Field> 
                     <ButtonTypeFilter onPress={()=>{}}>
-                        <IconTypeFilter name="chevron-down"/>
+                        <IconTypeFilter name="sliders"/>
                     </ButtonTypeFilter>                    
                 </FilterForm>
                 <Separador/>
@@ -201,10 +233,11 @@ export function ProductView() {
             }
 
             <MyCarButton onPress={handlerOpenCarrinho}>
+                <ItemsPedido>{tItems}</ItemsPedido>
                 <Ionicons name="cart" size={32} color={theme.colors.shape}/>
             </MyCarButton>
 
-            <Modalize ref={modalizeRef}>
+            <Modalize onClose={()=>getLengthCarrinho()} ref={modalizeRef}>
                 <ShoppingBag cli={cli} tipo='novo'/>
             </Modalize>
 

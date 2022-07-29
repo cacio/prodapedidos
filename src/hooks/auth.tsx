@@ -119,20 +119,20 @@ function AuthProvider({children}:AuthProviderProps){
          try {
             
             const response = await api.post('/auth',{
-                email:email,
+                email:email.trim(),
                 passwd:password
             });
             
             const {token,usuario } = response.data;
                         
             api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            setUserData({...usuario,token});
+            
             
             const userConllection =  database.get<modelUser>('usuarios');
 
             await database.write(async () =>{
                 await userConllection.create((newUser)=>{
-                    console.log(usuario);
+                    //console.log(usuario);
                     newUser.user_id  = usuario.id;
                     newUser.name     = usuario.name;
                     newUser.email    = usuario.email;
@@ -142,8 +142,13 @@ function AuthProvider({children}:AuthProviderProps){
                     newUser.token    = token;
                 })
             });
+            
+            const responseUser = await userConllection.query().fetch();
+            const userData = responseUser[0]._raw as unknown as User;
 
-        } catch (error) {                    
+            setUserData({...userData,token});
+
+        } catch (error) {                         
             throw new Error(String(error));
         }
 
@@ -153,15 +158,19 @@ function AuthProvider({children}:AuthProviderProps){
     async function signOut() {
 
         try {
+            
             const userConllection = database.get<modelUser>('usuarios');
+            const datau = await userConllection.query().fetch();
+
             await database.write(async ()=>{
-                const userSelected = await userConllection.find(userData.id)
-                await userSelected.destroyPermanently();                
+               const userSelected = await userConllection.find(userData.id);                
+               await userSelected.destroyPermanently();                
             });
 
              setUserData({} as User);
+             /*
              await AsyncStorage.removeItem(userStorageKey);
-
+            */
         } catch (error) {
             throw new Error(''+error+'');
         }
@@ -191,7 +200,7 @@ function AuthProvider({children}:AuthProviderProps){
                 const userCollection = database.get<modelUser>('usuarios');
                 const response = await userCollection.query().fetch();
                 
-                //console.log(response);
+               
                 if(response.length > 0){
 
                     const userData = response[0]._raw as unknown as User;
@@ -199,6 +208,8 @@ function AuthProvider({children}:AuthProviderProps){
                     //console.log(userData);
                     setUserData(userData);
                 }
+
+               // console.log('user: ',userData);
 
               //  console.log(response);
                /*const userStorage = await AsyncStorage.getItem(userStorageKey); 

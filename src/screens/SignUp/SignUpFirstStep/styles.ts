@@ -46,5 +46,5 @@ export const FormTitle = styled.Text`
     font-size: ${RFValue(20)}px;
     font-family: ${({theme})=> theme.fonts.medium};
     color: ${({theme})=> theme.colors.shape};
-    margin-bottom: 24px;
+    margin-bottom: 10px;
 `;

@@ -57,20 +57,28 @@ export const Details = styled.View`
 export const Estoque = styled.Text`
     font-size: ${RFValue(11)}px;
     font-family: ${({theme})=>theme.fonts.medium};
-    color: ${({theme})=>theme.colors.secundary};
+    color: ${({theme})=>theme.colors.shape};
     margin-right: 5px;
 `;
 
 export const Pc = styled.Text`
     font-size: ${RFValue(11)}px;
     font-family: ${({theme})=>theme.fonts.medium};
-    color: ${({theme})=>theme.colors.secundary};
+    color: ${({theme})=>theme.colors.shape};
     margin-right: 5px;
 `;
 
 export const PesoMedio = styled.Text`
     font-size: ${RFValue(11)}px;
     font-family: ${({theme})=>theme.fonts.medium};
-    color: ${({theme})=>theme.colors.secundary};
+    color: ${({theme})=>theme.colors.shape};
     margin-right: 5px;
+`;
+
+export const LabelDetails = styled.View`    
+    background: ${({theme})=>theme.colors.text};
+    border-radius:20px ;
+    padding:1px 5px 0px 8px;
+    margin-left:5px;
+    margin-right:5px;
 `;

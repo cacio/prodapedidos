@@ -59,7 +59,7 @@ useEffect(()=>{
        {loading 
                 ?<Load/> 
                 :carrinho.map((item:CarrinhoProps) =>{
-                            return <Content key={Number(item.codigo)}>
+                            return <Content key={item.id}>
                                 <ItemCarrinho>
                                     <ProdutoWrapper>
                                         <Nome>{item.nomeprod} ({item.unidade})</Nome>

@@ -9,6 +9,7 @@ import { Produtos } from './model/Produtos';
 import { CondicoesPagamento } from './model/CondicoesPagamento';
 import { Pedido } from './model/Pedido';
 import { PedidoDetalhe } from './model/PedidoDetalhe';
+import { DuplicReceber } from './model/DuplicReceber';
 
 const adapter =  new SQLiteAdapter({
     schema:schemas
@@ -22,7 +23,8 @@ export const database = new Database({
         Produtos,
         CondicoesPagamento,
         Pedido,
-        PedidoDetalhe
+        PedidoDetalhe,
+        DuplicReceber
     ],
     
 })

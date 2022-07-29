@@ -1,8 +1,8 @@
 import { getBottomSpace, getStatusBarHeight } from 'react-native-iphone-x-helper';
-import { RFValue } from 'react-native-responsive-fontsize';
+import { RFValue,RFPercentage } from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native'; 
 import { TouchableOpacity,FlatList } from 'react-native';
-import {Feather} from '@expo/vector-icons';
+import {Feather,FontAwesome} from '@expo/vector-icons';
 import {RectButton} from 'react-native-gesture-handler';
 import { Produtos as modelProdutos } from '../../databases/model/Produtos';
 
@@ -28,13 +28,13 @@ export const Title = styled.Text`
 `;
 
 export const HeaderNavegation = styled.View`
-    padding: 0 24px;
-    margin-top: ${getStatusBarHeight() + RFValue(12)}px;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;   
-    border-color: ${({theme})=>theme.colors.secundary_light};
-    border-bottom-width: 1px;        
+    width:100%;
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:${getStatusBarHeight() + 18}px;  
+    padding:0 24px;
+    margin-bottom: 10px;       
 `;
 
 export const PrevHome = styled(TouchableOpacity)`    
@@ -51,11 +51,11 @@ export const NavIcon = styled(Feather)`
 `;
 
 export const NavTitle = styled.Text`
-    flex:1;    
+    
     color: ${({theme})=>theme.colors.shape};
     font-size:${RFValue(20)}px;
     text-align: center;
-    margin-left: -50px;
+    margin-right: 110px;
     margin-bottom: 10px;
 `;
 
@@ -95,7 +95,7 @@ export const ButtonTypeFilter = styled(TouchableOpacity)`
 
 `;
 
-export const IconTypeFilter = styled(Feather)`
+export const IconTypeFilter = styled(FontAwesome)`
     font-size: ${RFValue(24)}px;
     text-align: left;  
     color: ${({theme})=>theme.colors.text};  
@@ -158,4 +158,17 @@ export const MyCarButton = styled(RectButton)`
     position: absolute;
     bottom:13px;
     right:22px;
+`;
+
+export const ItemsPedido = styled.Text`
+    width: ${RFPercentage(10)}%;
+    border-radius: 25px;
+    padding:5px;
+    position: absolute;
+    background-color: ${({theme})=>theme.colors.secundary};
+    color: ${({theme})=>theme.colors.background};
+    top:-10px;
+    left:0px;
+    text-align:center ;
+    z-index: 9999;
 `;
